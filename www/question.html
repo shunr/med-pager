@@ -1,0 +1,34 @@
+<ion-view title="Question" hide-nav-bar="true" ng-controller="questionControl">
+    <ion-content padding="true" scroll="false" class="question-screen">
+
+        <div class="list card">
+            <timer id="countdown-timer" countdown="countdown" finish-callback="timeUp()" ng-model="timer" interval="1000">
+                <div class="item item-avatar">
+                    <img>
+                    <h2>Time left</h2>
+                    <p>{{seconds}} second{{secondsS}}</p>
+
+                </div>
+
+                <div class="timer-bar" style="width: calc(100% - {{progressBar}}%);">
+                    <div class="item item-positive">
+                    </div>
+                </div>
+            </timer>
+            <div class="item item-text-wrap" ng-model="question.text">
+                <p>
+                    {{question.text}}
+                </p>
+            </div>
+
+            <label class="item item-input">
+                <textarea rows="5" placeholder="Your answer" ng-model="question.answer"></textarea>
+            </label>
+        </div>
+
+        <button ng-click="submitQuestion()" class="button button-block button-positive">Submit</button>
+
+        <button ng-click="newQuestion()" class="button button-block button-positive">NEW</button>
+
+    </ion-content>
+</ion-view>

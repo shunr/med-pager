@@ -1,0 +1,37 @@
+<ion-view title="Signup" hide-nav-bar="true" ng-controller="signupControl">
+    <ion-nav-back-button class="button-icon icon ion-ios7-arrow-back">Back</ion-nav-back-button>
+    <ion-content padding="true" scroll="false" class="login-screen">
+        <form>
+            <div class="spacer" style="height: 2em;"></div>
+            <div class="row">
+                <div class="col col-33 col-offset-33">
+                    <img src="img/ionic.png" style="width:100%"/>
+                </div>
+            </div>
+
+            <div class="spacer" style="height: 1.5em;"></div>
+            <ion-list>
+                <label class="item item-input">
+                    <span><i class="icon ion-ios-person placeholder-icon"></i>&nbsp;&nbsp;</span>
+                    <input type="text" ng-model="data.name" placeholder="Full name">
+                </label>
+
+                <label class="item item-input">
+                    <span><i class="icon ion-ios-email placeholder-icon"></i>&nbsp;&nbsp;</span>
+                    <input type="email" ng-model="data.email" placeholder="Email">
+                </label>
+                <label class="item item-input">
+                    <span><i class="icon ion-ios-pricetag placeholder-icon"></i>&nbsp;&nbsp;</span>
+                    <input type="text" ng-model="data.sid" placeholder="Student ID">
+                </label>
+                <label class="item item-input">
+                    <span><i class="icon ion-ios-locked placeholder-icon"></i>&nbsp;&nbsp;</span>
+                    <input type="password" ng-model="data.pass" placeholder="Password">
+                </label>
+            </ion-list>
+            <div class="spacer" style="height: 1.5em;"></div>
+            <button ng-click="signupClick()" class="button button-positive button-block">Sign up</button>
+            <a href="#/login" class="button button-positive button-clear button-block ">Login</a>
+        </form>
+    </ion-content>
+</ion-view>

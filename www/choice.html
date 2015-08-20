@@ -1,0 +1,35 @@
+<ion-view title="Choice" hide-nav-bar="true" ng-controller="questionControl">
+    <ion-content padding="true" scroll="false" class="question-screen">
+
+        <div class="list card">
+            <div class="item item-avatar">
+                <img src="img/ionic.png">
+                <h2>Post-questionnaire</h2>
+                <p>What is an appropriate response to this situation?</p>
+            </div>
+
+            <div class="timer-bar">
+                <div class="item item-positive">
+                </div>
+            </div>
+
+            <div class="item item-text-wrap" ng-model="choice.text">
+                <p>
+                    Select a choice from the following 4.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                </p>
+            </div>
+        </div>
+
+        <div class="list card">
+            <ion-radio ng-repeat="item in question.choices"
+                       ng-value="item.value"
+                       ng-model="question.choices.selected">
+                {{ item.text }}
+            </ion-radio>
+        </div>
+
+        <button ng-click="submitChoice()" class="button button-block button-positive">Submit</button>
+
+    </ion-content>
+</ion-view>

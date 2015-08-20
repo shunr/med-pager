@@ -1,0 +1,23 @@
+.timer-bar {
+    height: 0.32em;
+    padding:0;
+    display:block;
+}
+
+.timer-bar .item{
+    border-radius:0 !important;
+    padding:0;
+    height:100%;
+    margin:0;
+    display:block;
+}
+
+.login-screen{
+    background-image:url("../img/login.jpg");
+    background-size:cover;
+}
+
+.question-screen{
+    background-image:url("../img/login.jpg");
+    background-size:cover;
+}
