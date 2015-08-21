@@ -5,14 +5,10 @@ var usersRef = fireRef.child('users');
 ctrl.factory('questionService', ['$firebaseObject', '$localstorage', function ($firebaseObject, $localstorage, $scope) {
     //$scope.user = $localstorage.getObject('user');
     return {
+        //grab a question from ones not answered
         getQuestion: function () {
-            //return $localstorage.getObject('user').sid
-            //for (i = 0; i < localStorage.length; i++) {
-            //    console.log(localStorage.key(i) + "=[" + localStorage.getItem(localStorage.key(i)) + "]");
-            //}
-
-            var swag = $firebaseObject(fireRef.child('pagerQuestions').child('Q001'));
-            return (swag); 
+            var randIndex = Math.round(Math.random() * $localstorage.getObject('availableQuestions').length);
+            return $firebaseObject(fireRef.child('pagerQuestions').child($localstorage.getObject('availableQuestions')[randIndex]))
         },
         //push question answer to appropriate location on firebase user
         setAnswer: function (qref, ans) {
@@ -26,6 +22,28 @@ ctrl.factory('questionService', ['$firebaseObject', '$localstorage', function ($
 
             //!TODO! make failsafe in case user becomes unauthed during submission
         },
+        //save an array of the keys of all teh questions in the firebase that the user has not answered.
+        saveAvailableQuestions: function () {
+            var userAnswers = $firebaseObject(usersRef.child($localstorage.getObject('user').sid).child('answers'));
+            var availableQuestions = [];
+            var questionsFire = $firebaseObject(fireRef.child('pagerQuestions'));
+
+            questionsFire.$loaded(function (data) {
+                data.forEach(function (value, key) {
+                    availableQuestions.push(key);
+                });
+            }).then(function () {
+                userAnswers.$loaded(function (data) {
+                    data.forEach(function (value, rkey) {
+                        var i = availableQuestions.indexOf(rkey);
+                        if (i != -1) {
+                            availableQuestions.splice(i, 1);
+                        }
+                    });
+                    $localstorage.setObject('availableQuestions', availableQuestions);
+                })
+            });
+        }
     };
 }]);
 
@@ -37,6 +55,7 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
     $scope.questionRef = {}
     $scope.countdown = 30;
 
+    //trigger event when time runs out to auto send and go to next page
     $scope.timeUp = function () {
         if ($scope.questionRef.$id !== undefined) {
             questionService.setAnswer($scope.questionRef.$id, $scope.question.answer);
@@ -58,6 +77,7 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
             if (res) {
                 //push answer to firebase
                 questionService.setAnswer($scope.questionRef.$id, $scope.question.answer);
+                questionService.saveAvailableQuestions();
                 $ionicViewSwitcher.nextDirection('forward');
                 $state.go('choice');
                 console.log('Submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.answer);
@@ -73,8 +93,6 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
     }
     };
 
-   
-
     //!TEMP! generate new question for testing
     $scope.newQuestion = function () {
         $scope.questionRef = questionService.getQuestion();
@@ -82,6 +100,7 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
             $scope.question.text = data.$value;
             $localstorage.set('currentQuestion', $scope.questionRef.$id);
             $scope.$broadcast('timer-set-countdown-seconds', $scope.countdown);
+            $scope.$broadcast('timer-start');
         });
         
     };

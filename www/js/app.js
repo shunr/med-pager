@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 var app = angular.module('pager', ['ionic', 'utils', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
 
-app.run(function ($ionicPlatform, $state, $ionicViewSwitcher, $authService) {
+app.run(function ($ionicPlatform, $state, $ionicViewSwitcher, $authService, questionService) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -25,6 +25,7 @@ app.run(function ($ionicPlatform, $state, $ionicViewSwitcher, $authService) {
                 $ionicViewSwitcher.nextDirection('forward');
                 $state.go('menu');
                 $authService.saveLocalUser(authData);
+                questionService.saveAvailableQuestions();
             } else {
                 $ionicViewSwitcher.nextDirection('back');
                 $state.go('login');
