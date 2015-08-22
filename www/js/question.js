@@ -1,30 +1,31 @@
-﻿var ctrl = angular.module('pager.question', ['firebase', 'ui.router', 'utils', 'timer'])
+﻿var ctrl = angular.module('pager.question', ['firebase', 'ui.router', 'timer', 'ngStorage'])
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 var usersRef = fireRef.child('users');
 
-ctrl.factory('questionService', ['$firebaseObject', '$localstorage', function ($firebaseObject, $localstorage, $scope) {
-    //$scope.user = $localstorage.getObject('user');
+ctrl.factory('questionService', ['$firebaseObject', '$localStorage', function ($firebaseObject, $localStorage, $scope) {
+    //$scope.user = $localStorage.getObject('user');
     return {
         //grab a question from ones not answered
         getQuestion: function () {
-            var randIndex = Math.round(Math.random() * $localstorage.getObject('availableQuestions').length);
-            return $firebaseObject(fireRef.child('pagerQuestions').child($localstorage.getObject('availableQuestions')[randIndex]))
+            var randIndex = Math.floor(Math.random() * $localStorage.availableQuestions.length);
+            return $firebaseObject(fireRef.child('pagerQuestions').child($localStorage.availableQuestions[randIndex]))
         },
         //push question answer to appropriate location on firebase user
         setAnswer: function (qref, ans) {
-            var answersRef = usersRef.child($localstorage.getObject('user').sid).child('answers');
-            answersRef.child(qref).set(ans);
+            var answersRef = usersRef.child($localStorage.user.sid).child('responses');
+            answersRef.child(qref).child('answer').set(ans);
+            answersRef.child(qref).child('time').set(new Date().toDateString());
         },
         //push post-question multiple choice to appropriate location on firebase user
         setChoice: function (qref, ans) {
-            var choiceRef = usersRef.child($localstorage.getObject('user').sid).child('choices');
-            choiceRef.child(qref).set(ans);
+            var choiceRef = usersRef.child($localStorage.user.sid).child('responses');
+            choiceRef.child(qref).child('choice').set(ans);
 
             //!TODO! make failsafe in case user becomes unauthed during submission
         },
         //save an array of the keys of all teh questions in the firebase that the user has not answered.
         saveAvailableQuestions: function () {
-            var userAnswers = $firebaseObject(usersRef.child($localstorage.getObject('user').sid).child('answers'));
+            var userAnswers = $firebaseObject(usersRef.child($localStorage.user.sid).child('responses'));
             var availableQuestions = [];
             var questionsFire = $firebaseObject(fireRef.child('pagerQuestions'));
 
@@ -40,15 +41,22 @@ ctrl.factory('questionService', ['$firebaseObject', '$localstorage', function ($
                             availableQuestions.splice(i, 1);
                         }
                     });
-                    $localstorage.setObject('availableQuestions', availableQuestions);
+                    $localStorage.availableQuestions = availableQuestions;
                 })
             });
+        },
+        //parse question text for link to image and use it
+        parseText: function(data) {
+            return data.split("[IMG]")[0]
+        },
+        parseImage: function(data) {
+            return data.split("[IMG]")[1]
         }
     };
 }]);
 
 
-ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionicViewSwitcher, $localstorage, questionService) {
+ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionicViewSwitcher, $localStorage, questionService) {
 
     $scope.question = {}
     $scope.question.answer = ""
@@ -78,6 +86,7 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
                 //push answer to firebase
                 questionService.setAnswer($scope.questionRef.$id, $scope.question.answer);
                 questionService.saveAvailableQuestions();
+                $scope.$broadcast('timer-stop');
                 $ionicViewSwitcher.nextDirection('forward');
                 $state.go('choice');
                 console.log('Submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.answer);
@@ -97,16 +106,25 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
     $scope.newQuestion = function () {
         $scope.questionRef = questionService.getQuestion();
         $scope.questionRef.$loaded(function (data) {
-            $scope.question.text = data.$value;
-            $localstorage.set('currentQuestion', $scope.questionRef.$id);
+            $scope.question.text = questionService.parseText(data.$value);
+            $scope.question.image = questionService.parseImage(data.$value);
+            $localStorage.currentQuestion = $scope.questionRef.$id;
             $scope.$broadcast('timer-set-countdown-seconds', $scope.countdown);
             $scope.$broadcast('timer-start');
         });
         
     };
 
-    //Post-questionnaire choices
+    $scope.$on('$ionicView.enter', function () {
+        $scope.newQuestion()
+    });
 
+    ionic.Platform.ready(function () {
+        // hide the status bar using the StatusBar plugin
+        StatusBar.hide();
+    });
+
+    //Post-questionnaire choices
     $scope.question.choices = [
     { text: "This is choice A", value: "a" },
     { text: "This is choice B", value: "b" },
@@ -125,10 +143,10 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
         confirmPopup.then(function (res) {
             if (res) {
                 //push choice to firebase
-                questionService.setChoice($localstorage.get('currentQuestion'), $scope.question.choices.selected);
+                questionService.setChoice($localStorage.currentQuestion, $scope.question.choices.selected);
                 $ionicViewSwitcher.nextDirection('forward');
-                console.log('Submitted choice to ' + $localstorage.get('currentQuestion') + ": " + $scope.question.choices.selected);
-                $localstorage.set('currentQuestion', null);
+                console.log('Submitted choice to ' + $localStorage.currentQuestion + ": " + $scope.question.choices.selected);
+                $localStorage.currentQuestion = null;
                 $state.go('menu');
                 
                 
@@ -138,6 +156,5 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
             }
         });
     };
-
 
 });

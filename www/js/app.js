@@ -5,9 +5,9 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-var app = angular.module('pager', ['ionic', 'utils', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
+var app = angular.module('pager', ['ionic', 'ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
 
-app.run(function ($ionicPlatform, $state, $ionicViewSwitcher, $authService, questionService) {
+app.run(function ($ionicPlatform, $state, $ionicViewSwitcher, $authService, $localStorage, $ionicPopup) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -24,8 +24,7 @@ app.run(function ($ionicPlatform, $state, $ionicViewSwitcher, $authService, ques
             if (authData) {
                 $ionicViewSwitcher.nextDirection('forward');
                 $state.go('menu');
-                $authService.saveLocalUser(authData);
-                questionService.saveAvailableQuestions();
+                $authService.saveLocalUser(authData)
             } else {
                 $ionicViewSwitcher.nextDirection('back');
                 $state.go('login');
@@ -34,7 +33,6 @@ app.run(function ($ionicPlatform, $state, $ionicViewSwitcher, $authService, ques
         }
 
         authDataCallback(fireRef.getAuth());
-
         fireRef.onAuth(authDataCallback);
 
     });

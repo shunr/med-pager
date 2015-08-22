@@ -1,7 +1,7 @@
-﻿var ctrl = angular.module('pager.login', ['firebase', 'ui.router', 'utils'])
+﻿var ctrl = angular.module('pager.login', ['firebase', 'ui.router', 'ngStorage', 'pager.question'])
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 
-ctrl.factory('$authService', ['$firebaseObject', '$localstorage', function ($firebaseObject, $localstorage) {
+ctrl.factory('$authService', ['$firebaseObject', '$localStorage', 'questionService', function ($firebaseObject, $localStorage, questionService) {
     return {
         saveLocalUser: function (authData) {
             var email = authData.password.email;
@@ -9,15 +9,16 @@ ctrl.factory('$authService', ['$firebaseObject', '$localstorage', function ($fir
             userObj.$loaded(
                 function (data) {
                     data.forEach(function (child) {
-                        $localstorage.setObject('user', child);
-                        console.log('Authenticated as ' + $localstorage.getObject('user').email)
+                        $localStorage.user = child;
+                        questionService.saveAvailableQuestions();
+                        console.log('Authenticated as ' + $localStorage.user.email)
                     });
 
                 }
             );
         },
         clearLocalUser: function () {
-            $localstorage.setObject('user', null);
+            $localStorage.user = null;
         }
     }
 }]);
