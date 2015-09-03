@@ -1,7 +1,8 @@
 ﻿var ctrl = angular.module('pager.login', ['firebase', 'ui.router', 'ngStorage', 'pager.question'])
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 
-ctrl.factory('$authService', ['$firebaseObject', '$localStorage', 'questionService', function ($firebaseObject, $localStorage, questionService) {
+//service for authenticating the user and storing in localStorage
+ctrl.factory('$authService', ['$firebaseObject', '$localStorage', '$state', '$ionicViewSwitcher', '$ionicHistory', 'questionService', function ($firebaseObject, $localStorage, $state, $ionicViewSwitcher, $ionicHistory, questionService) {
     return {
         saveLocalUser: function (authData) {
             var email = authData.password.email;
@@ -10,8 +11,11 @@ ctrl.factory('$authService', ['$firebaseObject', '$localStorage', 'questionServi
                 function (data) {
                     data.forEach(function (child) {
                         $localStorage.user = child;
+                        $ionicViewSwitcher.nextDirection('forward');
+                        $state.go('menu');
                         questionService.saveAvailableQuestions();
                         console.log('Authenticated as ' + $localStorage.user.email)
+                        $ionicHistory.clearHistory();
                     });
 
                 }
@@ -19,6 +23,9 @@ ctrl.factory('$authService', ['$firebaseObject', '$localStorage', 'questionServi
         },
         clearLocalUser: function () {
             $localStorage.user = null;
+            $ionicViewSwitcher.nextDirection('back');
+            $state.go('login');
+            $ionicHistory.clearHistory();
         }
     }
 }]);
@@ -97,7 +104,7 @@ ctrl.controller('signupControl', function ($scope, $firebaseObject, $ionicPopup,
                         registrationError(error);
                     } else {
                         //if firebase registration success, write new user to database with permissions from previous authentication
-                        usersRef.child(sid).set({ name: name, email: email, sid: sid });
+                        usersRef.child(sid).set({ name: name, email: email, sid: sid, dailyQuestions: 5});
                         //hooray message
                         $ionicPopup.alert({
                             title: 'Success',

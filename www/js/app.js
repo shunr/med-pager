@@ -5,9 +5,9 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-var app = angular.module('pager', ['ionic', 'ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
+var app = angular.module('pager', ['ionic','ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
 
-app.run(function ($ionicPlatform, $state, $ionicViewSwitcher, $authService, $localStorage, $ionicPopup) {
+app.run(function ($ionicPlatform, $authService, $localStorage, $ionicPopup) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -16,18 +16,14 @@ app.run(function ($ionicPlatform, $state, $ionicViewSwitcher, $authService, $loc
         }
         if (window.StatusBar) {
             // org.apache.cordova.statusbar required
-            StatusBar.styleDefault();
+            StatusBar.style(0);
         }
 
         //check if user is authenticated
         function authDataCallback(authData) {
             if (authData) {
-                $ionicViewSwitcher.nextDirection('forward');
-                $state.go('menu');
                 $authService.saveLocalUser(authData)
             } else {
-                $ionicViewSwitcher.nextDirection('back');
-                $state.go('login');
                 $authService.clearLocalUser();
             }
         }
@@ -64,12 +60,18 @@ app.config(function ($stateProvider, $urlRouterProvider) {
 
       .state('question', {
           url: '/question',
-          templateUrl: 'question.html'
+          templateUrl: 'question.html',
+          params: {
+              isDaily: false,
+          }
       })
 
       .state('choice', {
           url: '/choice',
-          templateUrl: 'choice.html'
+          templateUrl: 'choice.html',
+          params: {
+              questionRef: "",
+          }
       })
     ;
 

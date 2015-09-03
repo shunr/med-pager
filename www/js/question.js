@@ -8,19 +8,23 @@ ctrl.factory('questionService', ['$firebaseObject', '$localStorage', function ($
         //grab a question from ones not answered
         getQuestion: function () {
             var randIndex = Math.floor(Math.random() * $localStorage.availableQuestions.length);
-            return $firebaseObject(fireRef.child('pagerQuestions').child($localStorage.availableQuestions[randIndex]))
+            return fireRef.child('pagerQuestions').child($localStorage.availableQuestions[randIndex])
         },
         //push question answer to appropriate location on firebase user
-        setAnswer: function (qref, ans) {
-            var answersRef = usersRef.child($localStorage.user.sid).child('responses');
-            answersRef.child(qref).child('answer').set(ans);
-            answersRef.child(qref).child('time').set(new Date().toDateString());
+        setAnswer: function (qref, ans, isDaily) {
+            var useransRef = usersRef.child($localStorage.user.sid).child('responses');
+            useransRef.child(qref).set(true);
+
+            var answersRef = fireRef.child('answers').child(qref);
+            answersRef.child($localStorage.user.sid).child('answer').set(ans);
+            answersRef.child($localStorage.user.sid).child('isDaily').set(isDaily);
+            answersRef.child($localStorage.user.sid).child('isCorrect').set(false);
+            answersRef.child($localStorage.user.sid).child('time').set(Firebase.ServerValue.TIMESTAMP);
         },
         //push post-question multiple choice to appropriate location on firebase user
         setChoice: function (qref, ans) {
-            var choiceRef = usersRef.child($localStorage.user.sid).child('responses');
-            choiceRef.child(qref).child('choice').set(ans);
-
+            var choiceRef = fireRef.child('answers').child(qref);
+            choiceRef.child($localStorage.user.sid).child('choice').set(ans);
             //!TODO! make failsafe in case user becomes unauthed during submission
         },
         //save an array of the keys of all teh questions in the firebase that the user has not answered.
@@ -45,91 +49,111 @@ ctrl.factory('questionService', ['$firebaseObject', '$localStorage', function ($
                 })
             });
         },
-        //parse question text for link to image and use it
-        parseText: function(data) {
-            return data.split("[IMG]")[0]
-        },
-        parseImage: function(data) {
-            return data.split("[IMG]")[1]
-        }
+
     };
 }]);
 
 
-ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionicViewSwitcher, $localStorage, questionService) {
+ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionicViewSwitcher, $localStorage, $ionicHistory, $stateParams, $firebaseArray, $firebaseObject, questionService) {
 
-    $scope.question = {}
-    $scope.question.answer = ""
-    $scope.questionRef = {}
-    $scope.countdown = 30;
+    $scope.question = {};
+    $scope.questionRef = {};
+    $scope.countdown = 10;
+    $scope.selected = {};
 
     //trigger event when time runs out to auto send and go to next page
     $scope.timeUp = function () {
         if ($scope.questionRef.$id !== undefined) {
-            questionService.setAnswer($scope.questionRef.$id, $scope.question.answer);
+            questionService.setAnswer($scope.questionRef.$id, "", $stateParams.isDaily);
+            questionService.saveAvailableQuestions();
+            $scope.$broadcast('timer-stop');
             $ionicViewSwitcher.nextDirection('forward');
-            $state.go('choice');
-            console.log('TIMEOUT - Forcibly submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.answer);
+            $state.go('choice', { questionRef: $scope.questionRef.$id });
+            $ionicHistory.clearHistory();
+            console.log('TIMEOUT - Forcibly submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.selected);
         } else {
             $scope.$broadcast('timer-stop');
         }
     }
 
     $scope.submitQuestion = function () {
-        if ($scope.question.answer != undefined && $scope.question.answer != "") {
-        var confirmPopup = $ionicPopup.confirm({
-            title: 'Submit Answer',
-            template: 'Are you sure you want to submit your answer?'
-        });
-        confirmPopup.then(function (res) {
-            if (res) {
-                //push answer to firebase
-                questionService.setAnswer($scope.questionRef.$id, $scope.question.answer);
-                questionService.saveAvailableQuestions();
-                $scope.$broadcast('timer-stop');
-                $ionicViewSwitcher.nextDirection('forward');
-                $state.go('choice');
-                console.log('Submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.answer);
-            } else {
-                //cancel
-            }
-        });
-    } else {
-        $ionicPopup.alert({
-            title: 'Submission error',
-            template: 'The answer field cannot be left blank.'
-        });
-    }
+        if ($scope.question.choices.selected != undefined) {
+            var confirmPopup = $ionicPopup.confirm({
+                title: 'Submit Answer ' + $scope.questionRef.$id,
+                template: 'Are you sure you want to submit your answer?'
+            });
+            confirmPopup.then(function (res) {
+                if (res) {
+                    //push answer to firebase
+                    questionService.setAnswer($scope.questionRef.$id, $scope.question.choices.selected, $stateParams.isDaily);
+                    questionService.saveAvailableQuestions();
+                    $scope.$broadcast('timer-stop');
+                    $ionicViewSwitcher.nextDirection('forward');
+                    $state.go('choice', { questionRef: $scope.questionRef.$id });
+                    $ionicHistory.clearHistory();
+                    console.log('Submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.selected);
+                } else {
+                    //cancel
+                }
+            });
+        } else {
+            $ionicPopup.alert({
+                title: 'Submission error',
+                template: 'Please select an answer.'
+            });
+        }
     };
 
     //!TEMP! generate new question for testing
     $scope.newQuestion = function () {
-        $scope.questionRef = questionService.getQuestion();
+        $scope.questionRef = $firebaseObject(questionService.getQuestion());
+        $scope.question.choices = $firebaseArray(questionService.getQuestion().child('choices'));
         $scope.questionRef.$loaded(function (data) {
-            $scope.question.text = questionService.parseText(data.$value);
-            $scope.question.image = questionService.parseImage(data.$value);
-            $localStorage.currentQuestion = $scope.questionRef.$id;
+            //$scope.question.text = questionService.parseText(data.question.$value);
+            //$scope.question.image = questionService.parseImage(data.question.$value);
             $scope.$broadcast('timer-set-countdown-seconds', $scope.countdown);
             $scope.$broadcast('timer-start');
         });
-        
     };
 
+    //parse question text for link to image and use it
+    $scope.parseText = function (data) {
+        if (data !== undefined) {
+            return data.split("[IMG]")[0]
+        }
+    },
+    $scope.parseImage = function (data) {
+        if (data !== undefined) {
+            return data.split("[IMG]")[1]
+        }
+    },
+
+
+    //Trigger event to start up the question page
     $scope.$on('$ionicView.enter', function () {
-        $scope.newQuestion()
+        //generate newquestion if on question page
+        if ($ionicHistory.currentStateName() == "question") {
+            $scope.newQuestion($stateParams.isDaily);
+        }
     });
 
     ionic.Platform.ready(function () {
         // hide the status bar using the StatusBar plugin
-        StatusBar.hide();
+        if (ionic.Platform.isWebView()) {
+            if ($ionicHistory.currentStateName() == "question") {
+                ionic.Platform.showStatusBar(false);
+            } else {
+                ionic.Platform.showStatusBar(true);
+            }
+        }
     });
 
     //Post-questionnaire choices
     $scope.question.choices = [
-    { text: "This is choice A", value: "a" },
-    { text: "This is choice B", value: "b" },
-    { text: "This is choice C", value: "c" },
-    { text: "This is choice D", value: "d" }
+    { text: "This is choice A", value: "A" },
+    { text: "This is choice B", value: "B" },
+    { text: "This is choice C", value: "C" },
+    { text: "This is choice D", value: "D" }
     ];
 
     //Set selected choice to user selection
@@ -137,19 +161,19 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
 
     $scope.submitChoice = function () {
         var confirmPopup = $ionicPopup.confirm({
-            title: 'Submit Answer',
+            title: 'Submit Answer ' + $stateParams.questionRef,
             template: 'Are you sure you want to submit your answer?'
         });
         confirmPopup.then(function (res) {
             if (res) {
                 //push choice to firebase
-                questionService.setChoice($localStorage.currentQuestion, $scope.question.choices.selected);
+                questionService.setChoice($stateParams.questionRef, $scope.question.choices.selected);
                 $ionicViewSwitcher.nextDirection('forward');
-                console.log('Submitted choice to ' + $localStorage.currentQuestion + ": " + $scope.question.choices.selected);
-                $localStorage.currentQuestion = null;
+                $ionicHistory.clearHistory();
+                console.log('Submitted choice to ' + $stateParams.questionRef + ": " + $scope.question.choices.selected);
                 $state.go('menu');
-                
-                
+
+
             } else {
                 //cancel
                 console.log('You are not sure');

@@ -8,7 +8,7 @@
                 <p>{{seconds}} second{{secondsS}}</p>
             </div>
 
-            <div class="timer-bar" style="width: {{seconds/30 * 100}}%; display:block">
+            <div class="timer-bar" style="width: {{seconds/countdown * 100}}%; display:block">
                 <div class="item item-positive"></div>
             </div>
 
@@ -19,15 +19,19 @@
 
         <div class="list card">
             <div class="item item-text-wrap">
-                <img src="{{question.image}}" class="full-image">
+                <img src="{{parseImage(questionRef.question)}}" class="full-image">
                 <p align="justify">
-                    {{question.text}}
+                    {{parseText(questionRef.question)}}
                 </p>
             </div>
+        </div>
 
-            <label class="item item-input">
-                <textarea rows="5" placeholder="Your answer" ng-model="question.answer"></textarea>
-            </label>
+        <div class="list card">
+            <ion-radio ng-repeat="item in question.choices"
+                       ng-value="item.$id"
+                       ng-model="question.choices.selected">
+                {{ item.$value }}
+            </ion-radio>
         </div>
 
         <button ng-click="submitQuestion()" class="button button-block button-positive">Submit</button>
