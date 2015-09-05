@@ -58,7 +58,7 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
 
     $scope.question = {};
     $scope.questionRef = {};
-    $scope.countdown = 10;
+    $scope.countdown = 60;
     $scope.selected = {};
 
     //trigger event when time runs out to auto send and go to next page
