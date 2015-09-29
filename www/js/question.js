@@ -14,17 +14,25 @@ ctrl.factory('questionService', ['$firebaseObject', '$localStorage', function ($
         setAnswer: function (qref, ans, isDaily) {
             var useransRef = usersRef.child($localStorage.user.sid).child('responses');
             useransRef.child(qref).set(true);
-
             var answersRef = fireRef.child('answers').child(qref);
             answersRef.child($localStorage.user.sid).child('answer').set(ans);
             answersRef.child($localStorage.user.sid).child('isDaily').set(isDaily);
-            answersRef.child($localStorage.user.sid).child('isCorrect').set(false);
             answersRef.child($localStorage.user.sid).child('time').set(Firebase.ServerValue.TIMESTAMP);
+            var answerObj = $firebaseObject(fireRef.child('pagerQuestions').child(qref).child('answers').child('first'));
+            answerObj.$loaded(function (data) {
+                answersRef.child($localStorage.user.sid).child('isCorrect').set(ans == data.$value);
+            });
         },
         //push post-question multiple choice to appropriate location on firebase user
         setChoice: function (qref, ans) {
             var choiceRef = fireRef.child('answers').child(qref);
+            var answerObj = $firebaseObject(fireRef.child('pagerQuestions').child(qref).child('answers').child('second'));
             choiceRef.child($localStorage.user.sid).child('choice').set(ans);
+            answerObj.$loaded(function (data) {
+                choiceRef.child($localStorage.user.sid).child('isChoiceCorrect').set(ans == data.$value);
+            });
+
+            
             //!TODO! make failsafe in case user becomes unauthed during submission
         },
         //save an array of the keys of all teh questions in the firebase that the user has not answered.
@@ -64,13 +72,13 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
     //trigger event when time runs out to auto send and go to next page
     $scope.timeUp = function () {
         if ($scope.questionRef.$id !== undefined) {
-            questionService.setAnswer($scope.questionRef.$id, "", $stateParams.isDaily);
+            questionService.setAnswer($scope.questionRef.$id, $scope.question.choices.selected, $stateParams.isDaily);
             questionService.saveAvailableQuestions();
             $scope.$broadcast('timer-stop');
             $ionicViewSwitcher.nextDirection('forward');
             $state.go('choice', { questionRef: $scope.questionRef.$id });
             $ionicHistory.clearHistory();
-            console.log('TIMEOUT - Forcibly submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.selected);
+            console.log('TIMEOUT - Forcibly submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.choices.selected);
         } else {
             $scope.$broadcast('timer-stop');
         }
@@ -91,7 +99,7 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
                     $ionicViewSwitcher.nextDirection('forward');
                     $state.go('choice', { questionRef: $scope.questionRef.$id });
                     $ionicHistory.clearHistory();
-                    console.log('Submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.selected);
+                    console.log('Submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.choices.selected);
                 } else {
                     //cancel
                 }
@@ -150,10 +158,11 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
 
     //Post-questionnaire choices
     $scope.question.choices = [
-    { text: "This is choice A", value: "A" },
-    { text: "This is choice B", value: "B" },
-    { text: "This is choice C", value: "C" },
-    { text: "This is choice D", value: "D" }
+    { text: "Give a verbal order over the phone, no need to see the patient.", value: "A" },
+    { text: "See the patient when you have time (1-2 hrs) and write an order then.", value: "B" },
+    { text: "See the patient immediately.", value: "C" },
+    { text: "Call the senior (who is at home) for help.", value: "D" },
+    { text: "Call RACE for help.", value: "E" }
     ];
 
     //Set selected choice to user selection

@@ -1,27 +1,28 @@
 <ion-view title="Choice" hide-nav-bar="true" ng-controller="questionControl" cache-view="false">
-    <ion-content padding="true" scroll="true" has-bouncing="false" class="question-screen">
+    <ion-header-bar style="display:block; padding:0">
+        <div class="item item-avatar">
+            <img src="img/ionic.png">
+            <h2>Post-questionnaire</h2>
+            <p>Appropriate response to situation</p>
+        </div>
+        <div class="timer-bar">
+            <div class="item item-positive">
+            </div>
+        </div>
+    </ion-header-bar>
+
+    <ion-content padding="true" scroll="true" class="question-screen">
 
         <div class="list card">
-            <div class="item item-avatar">
-                <img src="img/ionic.png">
-                <h2>Post-questionnaire</h2>
-                <p>What is an appropriate response to this situation?</p>
-            </div>
 
-            <div class="timer-bar">
-                <div class="item item-positive">
-                </div>
-            </div>
-
-            <div class="item item-text-wrap" ng-model="choice.text">
+            <div class="item item-text-wrap">
                 <p>
-                    Select a choice from the following 4.
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    How would you like to respond to this page?
                 </p>
             </div>
         </div>
 
-        <div class="list card">
+        <div class="list card item-text-wrap">
             <ion-radio ng-repeat="item in question.choices"
                        ng-value="item.value"
                        ng-model="question.choices.selected">

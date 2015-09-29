@@ -1,12 +1,37 @@
 <ion-view title='{{title}}' ng-controller="menuControl">
     <ion-tabs class="tabs-striped tabs-icon-top tabs-positive">
 
-        <ion-tab title="Overview" icon="ion-ios7-person" on-select="titleChange('Overview')">
-            <ion-content padding="true" class="has-header menu-screen">
-                <a href="#/login" class="button button-assertive button-block ">Login</a>
-                <a ng-click="toQuestion(false)" class="button button-assertive button-block ">Question</a>
-                <button ng-click="test()" class="button button-assertive button-block ">test</button>
-            </ion-content>
+        <ion-tab title="Overview" icon="ion-ios-information" on-select="titleChange('Overview')">
+            <ion-content padding="true" class="has-header menu-screen dark">
+                <h2 class="text-center dark">Welcome to the MedsOnCall Pager (MOC Pager) App!</h2><br>
+                <h3 class="positive">This simulated paging program will be an essential part of your elective in Perioperative Management.</h3>
+                <br>
+                Please note that the pager program starts on the Saturday before the elective week and that you must keep your iPhone/iPad with you at the given times, and ensure that you are logged into the application and have Wi-Fi access or data available during those times. Please do not log out of the App during these 9 days and it will not log you out automatically. Below is a list of the given times during which you must have access to the MOC Pager App:
+                <br>
+                <h4 class="dark">
+                <br><i class="icon ion-ios-arrow-forward"></i>&nbsp;&nbsp;1st Saturday afternoon: 1-4pm 
+                <br><i class="icon ion-ios-arrow-forward"></i>&nbsp;&nbsp;1st Sunday morning: 9am-12pm
+                <br><i class="icon ion-ios-arrow-forward"></i>&nbsp;&nbsp;1st Sunday afternoon: 1-4pm
+                <br><i class="icon ion-ios-arrow-forward"></i>&nbsp;&nbsp;Monday afternoon: 1-4pm
+                <br><i class="icon ion-ios-arrow-forward"></i>&nbsp;&nbsp;Tuesday afternoon: 1-4pm
+                <br><i class="icon ion-ios-arrow-forward"></i>&nbsp;&nbsp;Wednesday afternoon: 1-4pm
+                <br><i class="icon ion-ios-arrow-forward"></i>&nbsp;&nbsp;Thursday afternoon: 1-4pm
+                <br><i class="icon ion-ios-arrow-forward"></i>&nbsp;&nbsp;Friday afternoon: 1-4pm
+                <br><i class="icon ion-ios-arrow-forward"></i>&nbsp;&nbsp;2nd Saturday morning: 9am-12pm
+                <br><i class="icon ion-ios-arrow-forward"></i>&nbsp;&nbsp;2nd Saturday afternoon: 1-4pm
+                <br><i class="icon ion-ios-arrow-forward"></i>&nbsp;&nbsp;2nd Sunday morning: 9am-12pm
+                <br><br>
+                </h4>
+                When you receive a page, you will have 2 minutes to open the page and once opened, 1 minute to choose the correct answer. Following submission of this answer, you will receive a follow-up question in regard to how you would like to manage this page. Although this question is not timed, it is recommended that you answer it immediately so that you do not forget about it. You will receive 8 pages for each of the time periods listed above and they will be sent randomly during these times, so make sure you can make yourself available to answer them.
+                <br><br>
+                You will also receive 8 daily pages that you must answer within the 24 hours of that day, however, you do not have to answer at any specific time of the day. Once opened, you will again only have 1 minute to answer the question and all questions must be answered by the end of each day. These will be provided each day from the first Saturday to the next Sunday.
+                <br><br>
+                Please do not share any of your questions or answers from the MOC Pager App with your fellow students.
+                <br><br>
+                Finally, please do not delete this App from your phone for the next 5 months in the event that we would like to test your retention in the future.
+                <br><br>
+                Thank you!
+</ion-content>
         </ion-tab>
 
         <ion-tab title="Daily" icon="ion-ios7-calendar-outline" on-select="titleChange('Daily Questions')">
@@ -26,7 +51,7 @@
                         </div>
                     </div>
 
-                    <button ng-click="getDaily()" class="button button-assertive button-block ">kek</button>
+                    <button ng-click="getDaily()" class="button button-assertive button-block" style="display:none">Get Daily</button>
 
                 </ion-list>
             </ion-content>
@@ -36,6 +61,8 @@
         <ion-tab title="Settings" icon="ion-ios7-gear" on-select="titleChange('Settings')">
             <ion-content padding="true" class="has-header menu-screen">
                 <button ng-click="logout()" class="button button-assertive button-block ">Log out</button>
+                <a href="#/login" class="button button-assertive button-block ">Login</a>
+                <a ng-click="toQuestion(false)" class="button button-assertive button-block ">Question</a>
             </ion-content>
         </ion-tab>
 
