@@ -22,7 +22,7 @@ app.run(function ($ionicPlatform, $authService, $localStorage, $ionicPopup) {
         //check if user is authenticated
         function authDataCallback(authData) {
             if (authData) {
-                $authService.saveLocalUser(authData)
+                $authService.saveLocalUser(authData);
             } else {
                 $authService.clearLocalUser();
             }

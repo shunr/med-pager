@@ -5,12 +5,13 @@ var usersRef = fireRef.child('users');
 ctrl.controller('menuControl', function ($scope, $firebaseObject, $ionicPopup, $state, $ionicViewSwitcher, $localStorage, questionService) {
 
     $scope.title = "MOC Pager";
+    $scope.storage = $localStorage
 
-    //Event handler for entering the menu view
-    $scope.$on('$ionicView.enter', function () {
-        
-
-
+    $scope.$watch('storage.user', function (val) {
+        if (val) {
+            var currentUser = $firebaseObject(usersRef.child(val.sid));
+            currentUser.$bindTo($scope, "user");
+        }
     });
 
     //Log the currect user out and unauthenticate from firebase
@@ -42,9 +43,6 @@ ctrl.controller('menuControl', function ($scope, $firebaseObject, $ionicPopup, $
         $scope.user.dailyQuestions = 5;
         console.log($scope.range($scope.user.dailyQuestions))
     }
-
-    var currentUser = $firebaseObject(usersRef.child($localStorage.user.sid));
-    currentUser.$bindTo($scope, "user");
 
     $scope.range = function (count) {
         return new Array(count);

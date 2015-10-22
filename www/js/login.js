@@ -11,11 +11,11 @@ ctrl.factory('$authService', ['$firebaseObject', '$localStorage', '$state', '$io
                 function (data) {
                     data.forEach(function (child) {
                         $localStorage.user = child;
-                        $ionicViewSwitcher.nextDirection('forward');
-                        $state.go('menu');
                         questionService.saveAvailableQuestions();
                         console.log('Authenticated as ' + $localStorage.user.email)
                         $ionicHistory.clearHistory();
+                        $ionicViewSwitcher.nextDirection('forward');
+                        $state.go('menu');
                     });
 
                 }
