@@ -1,4 +1,12 @@
 {
   "name": "pager",
-  "app_id": "71485aec"
+  "app_id": "71485aec",
+  "gulpStartupTasks": [
+    "sass",
+    "watch"
+  ],
+  "watchPatterns": [
+    "www/**/*",
+    "!www/lib/**/*"
+  ]
 }

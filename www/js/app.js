@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-var app = angular.module('pager', ['ionic','ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
+var app = angular.module('pager', ['ionic', 'ionic.service.core', 'ionic.service.push', 'ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router', 'ngCordova'])
 
 app.run(function ($ionicPlatform, $authService, $localStorage, $ionicPopup) {
     $ionicPlatform.ready(function () {
@@ -29,18 +29,32 @@ app.run(function ($ionicPlatform, $authService, $localStorage, $ionicPopup) {
         }
 
         authDataCallback(fireRef.getAuth());
+
         fireRef.onAuth(authDataCallback);
+        var push = new Ionic.Push({
+            "debug": true
+        });
+
+        push.register(function (token) {
+            console.log("Device token:", token.token);
+        });
 
     });
-
 })
 
-app.config(function ($stateProvider, $urlRouterProvider) {
+app.config(['$ionicAppProvider', function ($stateProvider, $urlRouterProvider, $ionicAppProvider) {
 
     // Ionic uses AngularUI Router which uses the concept of states
     // Learn more here: https://github.com/angular-ui/ui-router
     // Set up the various states which the app can be in.
     // Each state's controller can be found in controllers.js
+
+    $ionicAppProvider.identify({
+        app_id: '71485aec',
+        api_key: 'f4341a2d1799b2eb80189a67fb92477ed6f9348cb7d719ec',
+        dev_push: true
+    });
+
     $stateProvider
 
       .state('signup', {
@@ -79,4 +93,4 @@ app.config(function ($stateProvider, $urlRouterProvider) {
 
     $urlRouterProvider.otherwise('/menu');
 
-});
+}]);
