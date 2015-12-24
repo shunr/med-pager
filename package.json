@@ -1,7 +1,7 @@
 {
-  "name": "pager",
+  "name": "MOC Pager",
   "version": "1.0.0",
-  "description": "pager: An Ionic project",
+  "description": "A pager simulator app used to run an elective course at the University of Ottawa.",
   "dependencies": {
     "gulp": "^3.5.6",
     "gulp-sass": "^1.3.3",
