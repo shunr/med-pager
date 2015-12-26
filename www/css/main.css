@@ -1,3 +1,8 @@
+body .overflow-scroll {
+overflow: auto;
+overflow-x: hidden;
+}
+
 .timer-bar {
     height: 0.32em;
     padding:0;

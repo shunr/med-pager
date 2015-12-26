@@ -2,10 +2,16 @@
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 var usersRef = fireRef.child('users');
 
-ctrl.controller('menuControl', function ($scope, $firebaseObject, $ionicPopup, $state, $ionicViewSwitcher, $localStorage, questionService) {
+ctrl.controller('menuControl', function ($scope, $firebaseObject, $ionicPopup, $state, $ionicViewSwitcher, $localStorage, $cordovaStatusbar, $ionicPlatform, questionService) {
 
     $scope.title = "MOC Pager";
     $scope.storage = $localStorage
+    if (window.StatusBar) {
+        $ionicPlatform.ready(function () {
+            $cordovaStatusbar.overlaysWebView(true);
+            $cordovaStatusbar.styleColor('white');
+        });
+    }
 
     $scope.$watch('storage.user', function (val) {
         if (val) {
@@ -38,7 +44,7 @@ ctrl.controller('menuControl', function ($scope, $firebaseObject, $ionicPopup, $
             console.log("The notification has been set");
         });
     }*/
-    
+
     $scope.getDaily = function () {
         $scope.user.dailyQuestions = 5;
         console.log($scope.range($scope.user.dailyQuestions))

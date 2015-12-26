@@ -5,9 +5,18 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-var app = angular.module('pager', ['ionic', 'ionic.service.core', 'ionic.service.push', 'ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router', 'ngCordova'])
+var app = angular.module('pager', ['ionic', 'ngCordova', 'ionic.service.core', 'ionic.service.push', 'ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
 
-app.run(function ($ionicPlatform, $authService, $localStorage, $ionicPopup, $state) {
+app.config(['$ionicAppProvider', function ($ionicAppProvider) {
+    // Identify app
+    $ionicAppProvider.identify({
+        app_id: '71485aec',
+        api_key: 'f4341a2d1799b2eb80189a67fb92477ed6f9348cb7d719ec',
+        //dev_push: true
+    });
+}])
+
+app.run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -18,11 +27,10 @@ app.run(function ($ionicPlatform, $authService, $localStorage, $ionicPopup, $sta
             // org.apache.cordova.statusbar required
             StatusBar.style(0);
         }
-
         //Set up push
-        Ionic.io();
+        /*Ionic.io();
         var push = new Ionic.Push({
-            "debug": false,
+            "debug": true,
             "onNotification": function (notification) {
                 var payload = notification.payload;
                 console.log(notification, payload);
@@ -39,26 +47,7 @@ app.run(function ($ionicPlatform, $authService, $localStorage, $ionicPopup, $sta
                     "payload": { "$state": "question", "$stateParams": "{ isDaily: false }" }
                 }
             }
-        });
-
-        //check if user is authenticated
-        function authDataCallback(authData) {
-            if (authData) {
-                $authService.saveLocalUser(authData);
-                push.register(function (token) {
-                    // Log out your device token (Save this!)
-                    console.log("Got Token:", token.token);
-                });
-
-            } else {
-                $authService.clearLocalUser();
-            }
-        }
-
-        authDataCallback(fireRef.getAuth());
-
-        fireRef.onAuth(authDataCallback);
-
+        });*/
     });
 })
 
@@ -68,12 +57,6 @@ app.config(function ($stateProvider, $urlRouterProvider) {
     // Learn more here: https://github.com/angular-ui/ui-router
     // Set up the various states which the app can be in.
     // Each state's controller can be found in controllers.js
-
-    /*$ionicAppProvider.identify({
-        app_id: '71485aec',
-        api_key: 'f4341a2d1799b2eb80189a67fb92477ed6f9348cb7d719ec',
-        dev_push: true
-    });*/
 
     $stateProvider
 
@@ -112,5 +95,61 @@ app.config(function ($stateProvider, $urlRouterProvider) {
     // if none of the above states are matched, use this as the fallback
 
     $urlRouterProvider.otherwise('/menu');
+
+});
+
+app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $ionicUser, $ionicPush, $authService, $state) {
+
+    $ionicPlatform.ready(function () {
+        //check if user is authenticated
+        var authDataCallback = function (authData) {
+            if (authData) {
+                $authService.saveLocalUser(authData);
+
+                if (!$scope.identified) {
+                    var user = $ionicUser.get();
+                    if (!user.user_id) {
+                        // Set your user_id here, or generate a random one.
+                        user.user_id = $ionicUser.generateGUID();
+                    };
+                    angular.extend(user, {
+                        name: 'Pager User',
+                    });
+                    // Identify your user with the Ionic User Service
+
+                    $ionicUser.identify(user).then(function () {
+                        $scope.identified = true;
+                        console.log('Identified user ' + user.name + '\n ID ' + user.user_id);
+                        $ionicPush.register({
+                            canShowAlert: true, //Can pushes show an alert on your screen?
+                            canSetBadge: true, //Can pushes update app icon badges?
+                            canPlaySound: true, //Can notifications play a sound?
+                            canRunActionsOnWake: true, //Can run actions outside the app,
+                            onNotification: function (notification) {
+                                var payload = notification.payload;
+                                console.log(notification, payload);
+                                $state.go('question', { isDaily: false });
+                                return true;
+                            }
+                        });
+                    });
+                }
+            } else {
+                $authService.clearLocalUser();
+            }
+        }
+
+        // If something breaks uncomment this
+        //authDataCallback(fireRef.getAuth());
+
+        fireRef.onAuth(authDataCallback);
+    });
+
+    //Catch push registration event
+    $rootScope.$on('$cordovaPush:tokenReceived', function (event, data) {
+        alert("Successfully registered token " + data.token);
+        console.log('Ionic Push: Got token ', data.token, data.platform);
+        $scope.token = data.token;
+    });
 
 });
