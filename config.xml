@@ -7,7 +7,7 @@
   <author email="uo.pom.elective@gmail.com" href="https://github.com/indeed/med-pager">
       Ionic Framework Team
     </author>
-  <content src="http://192.168.0.13:8100" original-src="index.html"/>
+  <content src="index.html"/>
   <access origin="*"/>
   <preference name="orientation" value="portrait"/>
   <preference name="webviewbounce" value="false"/>

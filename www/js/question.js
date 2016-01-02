@@ -148,7 +148,7 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
     ionic.Platform.ready(function () {
         // hide the status bar using the StatusBar plugin
         if (ionic.Platform.isWebView()) {
-            if ($ionicHistory.currentStateName() == "question") {
+            if ($ionicHistory.currentStateName() == "question" || $ionicHistory.currentStateName() == "choice") {
                 ionic.Platform.showStatusBar(false);
             } else {
                 ionic.Platform.showStatusBar(true);

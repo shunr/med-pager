@@ -5,16 +5,16 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-var app = angular.module('pager', ['ionic', 'ngCordova', 'ionic.service.core', 'ionic.service.push', 'ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
+var app = angular.module('pager', ['ionic', 'ngCordova', 'ionic.service.core', 'ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
 
-app.config(['$ionicAppProvider', function ($ionicAppProvider) {
+/*app.config(['$ionicAppProvider', function ($ionicAppProvider) {
     // Identify app
     $ionicAppProvider.identify({
         app_id: '71485aec',
         api_key: 'f4341a2d1799b2eb80189a67fb92477ed6f9348cb7d719ec',
         //dev_push: true
     });
-}])
+}])*/
 
 app.run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
@@ -98,10 +98,109 @@ app.config(function ($stateProvider, $urlRouterProvider) {
 
 });
 
+app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $ionicUser, $authService, $state) {
+
+    $ionicPlatform.ready(function () {
+
+        //check if user is authenticated
+        var authDataCallback = function (authData) {
+            if (authData) {
+                $authService.saveLocalUser(authData);
+
+                /*//Catch push registration event
+                $rootScope.$on('$cordovaPushV5:notificationReceived', function (event, notification) {
+                    $state.go('question', { isDaily: false });
+                });
+
+                //Register ionic user
+                var user = $ionicUser.get();
+                if (!user.user_id) {
+                    // Set your user_id here, or generate a random one.
+                    user.user_id = $ionicUser.generateGUID();
+                };
+                angular.extend(user, {
+                    name: 'Pager User',
+                });
+
+                // Identify your user with the Ionic User Service
+                $ionicUser.identify(user).then(function () {
+
+                    console.log('Identified user ' + user.name + '\n ID ' + user.user_id);
+
+                    var options = {
+                        "ios": {
+                            "alert": true,
+                            "badge": true,
+                            "sound": true
+                        }
+                    };
+
+                    $cordovaPushV5.initialize(options).then(register);
+                    var register = function () {
+                        alert("OK");
+                        $cordovaPushV5.register().then(function (token) {
+                            alert('$cordovaPushV5:REGISTERED', token);
+                            // below code required to configure $cordovaPushV5 notifications emitter. Don't pass function it's not handler.
+                            $cordovaPushV5.onError();
+                            $cordovaPushV5.onNotification();
+                        }, function (err) {
+                            console.error('$cordovaPushV5:REGISTER_ERROR', err);
+                        });
+                    }
+
+                });*/
+
+                var push = new Ionic.Push({
+                    "debug": false,
+                    "onNotification": function (notification) {
+                        var payload = notification.payload;
+                        console.log(notification, payload);
+                        $state.go('question', { isDaily: false });
+                    },
+                    "onRegister": function (data) {
+                        console.log(data.token);
+                    },
+                    "pluginConfig": {
+                        "ios": {
+                            "badge": true,
+                            "sound": true
+                        },
+                        "android": {
+                            "iconColor": "#343434"
+                        }
+                    }
+                });
+
+                var user = Ionic.User.current();
+
+                var callback = function (pushToken) {
+                    console.log('Registered token:', pushToken.token);
+                    user.addPushToken(pushToken);
+                    user.save(); // you NEED to call a save after you add the token
+                }
+
+                push.register(callback);
+
+            } else {
+                $authService.clearLocalUser();
+            }
+        }
+
+        // If something breaks uncomment this
+        //authDataCallback(fireRef.getAuth());
+
+        fireRef.onAuth(authDataCallback);
+    });
+
+});
+
+/*
 app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $ionicUser, $ionicPush, $authService, $state) {
 
     $ionicPlatform.ready(function () {
         //check if user is authenticated
+        console.log("TEST: " + JSON.stringify(window.cordova));
+
         var authDataCallback = function (authData) {
             if (authData) {
                 $authService.saveLocalUser(authData);
@@ -119,6 +218,7 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $ionicU
 
                     $ionicUser.identify(user).then(function () {
                         $scope.identified = true;
+                        
                         console.log('Identified user ' + user.name + '\n ID ' + user.user_id);
                         $ionicPush.register({
                             canShowAlert: true, //Can pushes show an alert on your screen?
@@ -153,3 +253,4 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $ionicU
     });
 
 });
+*/
