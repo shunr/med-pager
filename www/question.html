@@ -3,7 +3,7 @@
         <timer id="countdown-timer" countdown="countdown" finish-callback="timeUp()" ng-model="timer" interval="1000">
 
             <div class="item item-avatar">
-                <img>
+                <img src="img/ionic.png">
                 <h2>Time left</h2>
                 <p>{{seconds}} second{{secondsS}}</p>
             </div>
@@ -19,9 +19,9 @@
 
         <div class="list card">
             <div class="item item-text-wrap">
-                <img src="{{parseImage(questionRef.question)}}" class="full-image">
+                <img src="{{question.image}}" class="full-image">
                 <p align="justify">
-                    {{parseText(questionRef.question)}}
+                    {{question.text}}
                 </p>
             </div>
         </div>

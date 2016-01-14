@@ -1,14 +1,16 @@
 <ion-view title="Choice" hide-nav-bar="true" ng-controller="questionControl" cache-view="false">
     <ion-header-bar style="display:block; padding:0">
-        <div class="item item-avatar">
-            <img src="img/ionic.png">
-            <h2>Post-questionnaire</h2>
-            <p>Appropriate response to situation</p>
-        </div>
-        <div class="timer-bar">
-            <div class="item item-positive">
+        <timer id="countdown-timer" countdown="countdown" ng-model="timer" interval="1000">
+            <div class="item item-avatar">
+                <img src="img/ionic.png">
+                <h2>Post-questionnaire</h2>
+                <p>Appropriate response to situation</p>
             </div>
-        </div>
+            <div class="timer-bar">
+                <div class="item item-positive">
+                </div>
+            </div>
+        </timer>
     </ion-header-bar>
 
     <ion-content padding="true" scroll="true" class="question-screen">

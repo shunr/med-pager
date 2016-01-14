@@ -1,53 +1,16 @@
-// Ionic Starter App
 
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-// 'starter.services' is found in services.js
-// 'starter.controllers' is found in controllers.js
 var app = angular.module('pager', ['ionic', 'ngCordova', 'ionic.service.core', 'ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
 
-/*app.config(['$ionicAppProvider', function ($ionicAppProvider) {
-    // Identify app
-    $ionicAppProvider.identify({
-        app_id: '71485aec',
-        api_key: 'f4341a2d1799b2eb80189a67fb92477ed6f9348cb7d719ec',
-        //dev_push: true
-    });
-}])*/
-
-app.run(function ($ionicPlatform) {
+app.run(function ($ionicPlatform, $cordovaStatusbar) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
         if (window.cordova && window.cordova.plugins.Keyboard) {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
         }
-        if (window.StatusBar) {
-            // org.apache.cordova.statusbar required
-            StatusBar.style(0);
+        if ($cordovaStatusbar) {
+           $cordovaStatusbar.overlaysWebView(true);
         }
-        //Set up push
-        /*Ionic.io();
-        var push = new Ionic.Push({
-            "debug": true,
-            "onNotification": function (notification) {
-                var payload = notification.payload;
-                console.log(notification, payload);
-                $state.go('question', { isDaily: false });
-            },
-            "onRegister": function (data) {
-                console.log(data.token);
-            },
-            "pluginConfig": {
-                "ios": {
-                    "alert": true,
-                    "badge": true,
-                    "sound": true,
-                    "payload": { "$state": "question", "$stateParams": "{ isDaily: false }" }
-                }
-            }
-        });*/
     });
 })
 
@@ -107,49 +70,6 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $ionicU
             if (authData) {
                 $authService.saveLocalUser(authData);
 
-                /*//Catch push registration event
-                $rootScope.$on('$cordovaPushV5:notificationReceived', function (event, notification) {
-                    $state.go('question', { isDaily: false });
-                });
-
-                //Register ionic user
-                var user = $ionicUser.get();
-                if (!user.user_id) {
-                    // Set your user_id here, or generate a random one.
-                    user.user_id = $ionicUser.generateGUID();
-                };
-                angular.extend(user, {
-                    name: 'Pager User',
-                });
-
-                // Identify your user with the Ionic User Service
-                $ionicUser.identify(user).then(function () {
-
-                    console.log('Identified user ' + user.name + '\n ID ' + user.user_id);
-
-                    var options = {
-                        "ios": {
-                            "alert": true,
-                            "badge": true,
-                            "sound": true
-                        }
-                    };
-
-                    $cordovaPushV5.initialize(options).then(register);
-                    var register = function () {
-                        alert("OK");
-                        $cordovaPushV5.register().then(function (token) {
-                            alert('$cordovaPushV5:REGISTERED', token);
-                            // below code required to configure $cordovaPushV5 notifications emitter. Don't pass function it's not handler.
-                            $cordovaPushV5.onError();
-                            $cordovaPushV5.onNotification();
-                        }, function (err) {
-                            console.error('$cordovaPushV5:REGISTER_ERROR', err);
-                        });
-                    }
-
-                });*/
-
                 var push = new Ionic.Push({
                     "debug": false,
                     "onNotification": function (notification) {
@@ -175,6 +95,10 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $ionicU
 
                 var callback = function (pushToken) {
                     console.log('Registered token:', pushToken.token);
+                    if (!user.id) {
+                        user.id = Ionic.User.anonymousId();
+                        // user.id = 'your-custom-user-id';
+                    }
                     user.addPushToken(pushToken);
                     user.save(); // you NEED to call a save after you add the token
                 }
@@ -193,64 +117,3 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $ionicU
     });
 
 });
-
-/*
-app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $ionicUser, $ionicPush, $authService, $state) {
-
-    $ionicPlatform.ready(function () {
-        //check if user is authenticated
-        console.log("TEST: " + JSON.stringify(window.cordova));
-
-        var authDataCallback = function (authData) {
-            if (authData) {
-                $authService.saveLocalUser(authData);
-
-                if (!$scope.identified) {
-                    var user = $ionicUser.get();
-                    if (!user.user_id) {
-                        // Set your user_id here, or generate a random one.
-                        user.user_id = $ionicUser.generateGUID();
-                    };
-                    angular.extend(user, {
-                        name: 'Pager User',
-                    });
-                    // Identify your user with the Ionic User Service
-
-                    $ionicUser.identify(user).then(function () {
-                        $scope.identified = true;
-                        
-                        console.log('Identified user ' + user.name + '\n ID ' + user.user_id);
-                        $ionicPush.register({
-                            canShowAlert: true, //Can pushes show an alert on your screen?
-                            canSetBadge: true, //Can pushes update app icon badges?
-                            canPlaySound: true, //Can notifications play a sound?
-                            canRunActionsOnWake: true, //Can run actions outside the app,
-                            onNotification: function (notification) {
-                                var payload = notification.payload;
-                                console.log(notification, payload);
-                                $state.go('question', { isDaily: false });
-                                return true;
-                            }
-                        });
-                    });
-                }
-            } else {
-                $authService.clearLocalUser();
-            }
-        }
-
-        // If something breaks uncomment this
-        //authDataCallback(fireRef.getAuth());
-
-        fireRef.onAuth(authDataCallback);
-    });
-
-    //Catch push registration event
-    $rootScope.$on('$cordovaPush:tokenReceived', function (event, data) {
-        alert("Successfully registered token " + data.token);
-        console.log('Ionic Push: Got token ', data.token, data.platform);
-        $scope.token = data.token;
-    });
-
-});
-*/

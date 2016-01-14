@@ -2,21 +2,35 @@
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 var usersRef = fireRef.child('users');
 
-ctrl.controller('menuControl', function ($scope, $firebaseObject, $ionicPopup, $state, $ionicViewSwitcher, $localStorage, $cordovaStatusbar, $ionicPlatform, questionService) {
+ctrl.controller('menuControl', function ($scope, $firebaseObject,$ionicHistory, $ionicPopup, $state, $ionicViewSwitcher, $localStorage, $cordovaStatusbar, $ionicPlatform, questionService) {
 
     $scope.title = "MOC Pager";
     $scope.storage = $localStorage
-    if (window.StatusBar) {
-        $ionicPlatform.ready(function () {
-            $cordovaStatusbar.overlaysWebView(true);
-            $cordovaStatusbar.styleColor('white');
-        });
-    }
+
+    /*$scope.$on('$ionicView.enter', function () {
+        if ($ionicHistory.currentStateName() == "menu") {
+            if ($cordovaStatusbar) {
+                $cordovaStatusbar.style(1);
+            }
+        }
+    });*/
 
     $scope.$watch('storage.user', function (val) {
         if (val) {
             var currentUser = $firebaseObject(usersRef.child(val.sid));
             currentUser.$bindTo($scope, "user");
+            currentUser.$loaded(function () {
+                if ($scope.storage.dailyTime == moment().startOf('day').format()) {
+                    console.log("Too soon")
+                } else {
+                    $scope.user.dailyQuestions = 8;
+                    $scope.storage.dailyTime = moment().startOf('day').format();
+                    $ionicPopup.alert({
+                        title: 'New daily questions',
+                        template: 'You have received 8 new questions for today.'
+                    });
+                }
+            })
         }
     });
 
@@ -44,11 +58,6 @@ ctrl.controller('menuControl', function ($scope, $firebaseObject, $ionicPopup, $
             console.log("The notification has been set");
         });
     }*/
-
-    $scope.getDaily = function () {
-        $scope.user.dailyQuestions = 5;
-        console.log($scope.range($scope.user.dailyQuestions))
-    }
 
     $scope.range = function (count) {
         return new Array(count);

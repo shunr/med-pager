@@ -96,6 +96,7 @@ ctrl.controller('signupControl', function ($scope, $firebaseObject, $ionicPopup,
                 registrationError(error);
             } else {
                 //Authenticate user to get write perms
+                fireRef.unauth();
                 fireRef.authWithPassword({
                     email: email,
                     password: pass,
@@ -104,7 +105,7 @@ ctrl.controller('signupControl', function ($scope, $firebaseObject, $ionicPopup,
                         registrationError(error);
                     } else {
                         //if firebase registration success, write new user to database with permissions from previous authentication
-                        usersRef.child(sid).set({ name: name, email: email, sid: sid, dailyQuestions: 5});
+                        usersRef.child(sid).set({ name: name, email: email, sid: sid, dailyQuestions: 8});
                         //hooray message
                         $ionicPopup.alert({
                             title: 'Success',

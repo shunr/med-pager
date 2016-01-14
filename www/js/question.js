@@ -32,7 +32,7 @@ ctrl.factory('questionService', ['$firebaseObject', '$localStorage', function ($
                 choiceRef.child($localStorage.user.sid).child('isChoiceCorrect').set(ans == data.$value);
             });
 
-            
+
             //!TODO! make failsafe in case user becomes unauthed during submission
         },
         //save an array of the keys of all teh questions in the firebase that the user has not answered.
@@ -62,7 +62,7 @@ ctrl.factory('questionService', ['$firebaseObject', '$localStorage', function ($
 }]);
 
 
-ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionicViewSwitcher, $localStorage, $ionicHistory, $stateParams, $firebaseArray, $firebaseObject, questionService) {
+ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionicPlatform, $cordovaStatusbar, $ionicViewSwitcher, $localStorage, $ionicHistory, $stateParams, $firebaseArray, $firebaseObject, questionService) {
 
     $scope.question = {};
     $scope.questionRef = {};
@@ -72,7 +72,9 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
     //trigger event when time runs out to auto send and go to next page
     $scope.timeUp = function () {
         if ($scope.questionRef.$id !== undefined) {
-            questionService.setAnswer($scope.questionRef.$id, $scope.question.choices.selected, $stateParams.isDaily);
+            if ($scope.question.choices.selected) {
+                questionService.setAnswer($scope.questionRef.$id, $scope.question.choices.selected, $stateParams.isDaily);
+            }
             questionService.saveAvailableQuestions();
             $scope.$broadcast('timer-stop');
             $ionicViewSwitcher.nextDirection('forward');
@@ -112,49 +114,53 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
         }
     };
 
+    //parse question text for link to image and use it
+    function parseText(data) {
+        if (data !== undefined) {
+            return data.split("[IMG]")[0]
+        }
+    }
+
+    function parseImage(data) {
+        if (data !== undefined) {
+            return data.split("[IMG]")[1]
+        }
+    }
+
     //!TEMP! generate new question for testing
     $scope.newQuestion = function () {
-        $scope.questionRef = $firebaseObject(questionService.getQuestion());
-        $scope.question.choices = $firebaseArray(questionService.getQuestion().child('choices'));
+        var qq = questionService.getQuestion();
+        $scope.questionRef = $firebaseObject(qq);
         $scope.questionRef.$loaded(function (data) {
-            //$scope.question.text = questionService.parseText(data.question.$value);
-            //$scope.question.image = questionService.parseImage(data.question.$value);
+            console.log(data)
+            $scope.question.choices = $firebaseArray(qq.child('choices'));
+            $scope.question.text = parseText(data.question);
+            $scope.question.image = parseImage(data.question);
             $scope.$broadcast('timer-set-countdown-seconds', $scope.countdown);
             $scope.$broadcast('timer-start');
         });
     };
-
-    //parse question text for link to image and use it
-    $scope.parseText = function (data) {
-        if (data !== undefined) {
-            return data.split("[IMG]")[0]
-        }
-    },
-    $scope.parseImage = function (data) {
-        if (data !== undefined) {
-            return data.split("[IMG]")[1]
-        }
-    },
-
 
     //Trigger event to start up the question page
     $scope.$on('$ionicView.enter', function () {
         //generate newquestion if on question page
         if ($ionicHistory.currentStateName() == "question") {
             $scope.newQuestion($stateParams.isDaily);
-        }
-    });
-
-    ionic.Platform.ready(function () {
-        // hide the status bar using the StatusBar plugin
-        if (ionic.Platform.isWebView()) {
-            if ($ionicHistory.currentStateName() == "question" || $ionicHistory.currentStateName() == "choice") {
-                ionic.Platform.showStatusBar(false);
-            } else {
-                ionic.Platform.showStatusBar(true);
+            if ($cordovaStatusbar) {
+                $cordovaStatusbar.hide();
             }
         }
     });
+
+    /*$ionicPlatform.ready(function () {
+        if ($cordovaStatusbar) {
+            if ($ionicHistory.currentStateName() == "menu" || $ionicHistory.currentStateName() == "login" || $ionicHistory.currentStateName() == "signup") {
+                $cordovaStatusbar.show();
+            } else {
+                $cordovaStatusbar.hide();
+            }
+        }
+    });*/
 
     //Post-questionnaire choices
     $scope.question.choices = [
@@ -181,8 +187,9 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
                 $ionicHistory.clearHistory();
                 console.log('Submitted choice to ' + $stateParams.questionRef + ": " + $scope.question.choices.selected);
                 $state.go('menu');
-
-
+                if ($cordovaStatusbar) {
+                    $cordovaStatusbar.show();
+                }
             } else {
                 //cancel
                 console.log('You are not sure');

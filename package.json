@@ -16,6 +16,7 @@
     "shelljs": "^0.3.0"
   },
   "cordovaPlugins": [
+    "cordova-plugin-statusbar",
     "phonegap-plugin-push",
     "ionic-plugin-keyboard",
     "cordova-plugin-console",
