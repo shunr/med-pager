@@ -2,7 +2,7 @@
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 var usersRef = fireRef.child('users');
 
-ctrl.controller('menuControl', function ($scope, $firebaseObject,$ionicHistory, $ionicPopup, $state, $ionicViewSwitcher, $localStorage, $cordovaStatusbar, $ionicPlatform, questionService) {
+ctrl.controller('menuControl', function ($scope, $firebaseObject, $ionicHistory, $ionicPopup, $state, $cordovaLocalNotification, $localStorage, $cordovaStatusbar, $ionicPlatform, questionService) {
 
     $scope.title = "MOC Pager";
     $scope.storage = $localStorage
@@ -37,6 +37,9 @@ ctrl.controller('menuControl', function ($scope, $firebaseObject,$ionicHistory, 
     //Log the currect user out and unauthenticate from firebase
     $scope.logout = function () {
         fireRef.unauth();
+        $localStorage.$reset();
+        $cordovaLocalNotification.clearAll()
+        $cordovaLocalNotification.cancelAll()
     }
 
     //Set the title of the page to match selected tab

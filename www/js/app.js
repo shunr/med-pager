@@ -9,7 +9,7 @@ app.run(function ($ionicPlatform, $cordovaStatusbar) {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
         }
         if ($cordovaStatusbar) {
-           $cordovaStatusbar.overlaysWebView(true);
+            $cordovaStatusbar.overlaysWebView(true);
         }
     });
 })
@@ -23,36 +23,36 @@ app.config(function ($stateProvider, $urlRouterProvider) {
 
     $stateProvider
 
-      .state('signup', {
-          url: '/signup',
-          templateUrl: 'signup.html'
-      })
+        .state('signup', {
+            url: '/signup',
+            templateUrl: 'signup.html'
+        })
 
-      .state('menu', {
-          url: '/menu',
-          templateUrl: 'menu.html'
-      })
+        .state('menu', {
+            url: '/menu',
+            templateUrl: 'menu.html'
+        })
 
-      .state('login', {
-          url: '/login',
-          templateUrl: 'login.html'
-      })
+        .state('login', {
+            url: '/login',
+            templateUrl: 'login.html'
+        })
 
-      .state('question', {
-          url: '/question',
-          templateUrl: 'question.html',
-          params: {
-              isDaily: false,
-          }
-      })
+        .state('question', {
+            url: '/question',
+            templateUrl: 'question.html',
+            params: {
+                isDaily: false,
+            }
+        })
 
-      .state('choice', {
-          url: '/choice',
-          templateUrl: 'choice.html',
-          params: {
-              questionRef: "",
-          }
-      })
+        .state('choice', {
+            url: '/choice',
+            templateUrl: 'choice.html',
+            params: {
+                questionRef: "",
+            }
+        })
     ;
 
     // if none of the above states are matched, use this as the fallback
@@ -61,7 +61,7 @@ app.config(function ($stateProvider, $urlRouterProvider) {
 
 });
 
-app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $ionicUser, $authService, $state) {
+app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localStorage, $authService, $state, $cordovaLocalNotification) {
 
     $ionicPlatform.ready(function () {
 
@@ -69,20 +69,33 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $ionicU
         var authDataCallback = function (authData) {
             if (authData) {
                 $authService.saveLocalUser(authData);
+                if (!$localStorage.notificationsScheduled) {
+                    $localStorage.notificationsScheduled = true
+                }
 
-                var push = new Ionic.Push({
+                var now = new Date().getTime(),
+                    _5_sec_from_now = new Date(now + 5 * 1000);
+
+                $cordovaLocalNotification.schedule({
+                    text: "Delayed Notification",
+                    at: _5_sec_from_now,
+                    sound: "file://beep.caf"
+                });
+                
+                /*var push = new Ionic.Push({
                     "debug": false,
                     "onNotification": function (notification) {
-                        var payload = notification.payload;
-                        console.log(notification, payload);
-                        $state.go('question', { isDaily: false });
+                        $ionicPlatform.ready(function () {
+                            var payload = notification.payload;
+                            console.log(notification, payload);
+                            $state.go('question', { isDaily: false });
+                        })
                     },
                     "onRegister": function (data) {
                         console.log(data.token);
                     },
                     "pluginConfig": {
                         "ios": {
-                            "badge": true,
                             "sound": true
                         },
                         "android": {
@@ -104,7 +117,7 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $ionicU
                 }
 
                 push.register(callback);
-
+                */
             } else {
                 $authService.clearLocalUser();
             }

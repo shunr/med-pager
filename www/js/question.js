@@ -168,7 +168,7 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
     { text: "See the patient when you have time (1-2 hrs) and write an order then.", value: "B" },
     { text: "See the patient immediately.", value: "C" },
     { text: "Call the senior (who is at home) for help.", value: "D" },
-    { text: "Call RACE for help.", value: "E" }
+    { text: "Call the appropriate service for help (e.g. RACE, Anesthesia, Internal Med, etc.)", value: "E" }
     ];
 
     //Set selected choice to user selection

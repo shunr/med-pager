@@ -15,7 +15,9 @@ ctrl.factory('$authService', ['$firebaseObject', '$localStorage', '$state', '$io
                         console.log('Authenticated as ' + $localStorage.user.email)
                         $ionicHistory.clearHistory();
                         $ionicViewSwitcher.nextDirection('forward');
-                        $state.go('menu');
+                        if ($ionicHistory.currentStateName() != "question") {
+                            $state.go('menu');
+                        }
                     });
 
                 }
