@@ -1,6 +1,6 @@
 body .overflow-scroll {
-overflow: auto;
-overflow-x: hidden;
+    overflow: auto;
+    overflow-x: hidden;
 }
 
 .timer-bar {

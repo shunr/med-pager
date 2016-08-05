@@ -1,46 +1,79 @@
+// LINE 6
+// LINE 71
+// LINE 100
 
-var app = angular.module('pager', ['ionic', 'ngCordova', 'ionic.service.core', 'ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
+var app = angular.module('pager', ['ionic', 'ngCordova', 'ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
 
 app.run(function ($ionicPlatform, $cordovaStatusbar) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
-        if (window.cordova && window.cordova.plugins.Keyboard) {
+        /*if (window.cordova && window.cordova.plugins.Keyboard) {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
         }
         if ($cordovaStatusbar) {
             $cordovaStatusbar.overlaysWebView(true);
-        }
+        }*/
     });
 })
 
 app.config(function ($stateProvider, $urlRouterProvider) {
-
-    // Ionic uses AngularUI Router which uses the concept of states
-    // Learn more here: https://github.com/angular-ui/ui-router
-    // Set up the various states which the app can be in.
-    // Each state's controller can be found in controllers.js
-
     $stateProvider
-
         .state('signup', {
             url: '/signup',
-            templateUrl: 'signup.html'
+            templateUrl: 'views/signup.html'
         })
+
+        /*.state('menu', {
+            url: '/menu',
+            templateUrl: 'views/menu.html'
+        })*/
 
         .state('menu', {
             url: '/menu',
-            templateUrl: 'menu.html'
+            abstract: true,
+            templateUrl: 'views/menu2.html',
+            controller: 'menuControl'
+        })
+
+        .state('menu.info', {
+            url: '/info',
+            views: {
+                'menuContent': {
+                    templateUrl: 'views/menu_info.html',
+                    controller: 'menuControl'
+                }
+            }
+        })
+
+        .state('menu.patients', {
+            url: '/patients',
+            views: {
+                'menuContent': {
+                    templateUrl: 'views/menu_patients.html',
+                    controller: 'menuControl'
+                }
+            }
+        })
+
+        .state('menu.daily', {
+            url: '/daily',
+            views: {
+                'menuContent': {
+                    templateUrl: 'views/menu_daily.html',
+                    controller: 'menuControl'
+                }
+            }
         })
 
         .state('login', {
             url: '/login',
-            templateUrl: 'login.html'
+            templateUrl: 'views/login.html'
         })
 
         .state('question', {
             url: '/question',
-            templateUrl: 'question.html',
+            templateUrl: 'views/question.html',
             params: {
                 isDaily: false,
             }
@@ -48,85 +81,67 @@ app.config(function ($stateProvider, $urlRouterProvider) {
 
         .state('choice', {
             url: '/choice',
-            templateUrl: 'choice.html',
+            templateUrl: 'views/choice.html',
             params: {
                 questionRef: "",
             }
-        })
-    ;
+        });
 
-    // if none of the above states are matched, use this as the fallback
-
-    $urlRouterProvider.otherwise('/menu');
+    $urlRouterProvider.otherwise('menu/info');
 
 });
 
-app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localStorage, $authService, $state, $cordovaLocalNotification) {
+app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localStorage, $authService, $state, $cordovaLocalNotification, $firebaseArray, $ionicPopup) {
 
     $ionicPlatform.ready(function () {
-
-        //check if user is authenticated
+        // Check if user is authenticated
         var authDataCallback = function (authData) {
             if (authData) {
                 $authService.saveLocalUser(authData);
-                if (!$localStorage.notificationsScheduled) {
-                    $localStorage.notificationsScheduled = true
-                }
-
-                var now = new Date().getTime(),
-                    _5_sec_from_now = new Date(now + 5 * 1000);
-
-                $cordovaLocalNotification.schedule({
-                    text: "Delayed Notification",
-                    at: _5_sec_from_now,
-                    sound: "file://beep.caf"
-                });
-                
-                /*var push = new Ionic.Push({
-                    "debug": false,
-                    "onNotification": function (notification) {
-                        $ionicPlatform.ready(function () {
-                            var payload = notification.payload;
-                            console.log(notification, payload);
-                            $state.go('question', { isDaily: false });
-                        })
-                    },
-                    "onRegister": function (data) {
-                        console.log(data.token);
-                    },
-                    "pluginConfig": {
-                        "ios": {
-                            "sound": true
-                        },
-                        "android": {
-                            "iconColor": "#343434"
-                        }
-                    }
-                });
-
-                var user = Ionic.User.current();
-
-                var callback = function (pushToken) {
-                    console.log('Registered token:', pushToken.token);
-                    if (!user.id) {
-                        user.id = Ionic.User.anonymousId();
-                        // user.id = 'your-custom-user-id';
-                    }
-                    user.addPushToken(pushToken);
-                    user.save(); // you NEED to call a save after you add the token
-                }
-
-                push.register(callback);
-                */
+                registerNotifications();
             } else {
                 $authService.clearLocalUser();
             }
         }
 
-        // If something breaks uncomment this
-        //authDataCallback(fireRef.getAuth());
+        /*cordova.plugins.notification.local.on("click", function (notification) {
+            $ionicPopup.alert({
+                title: 'New page',
+                template: 'Please answer the following question within the allotted time.'
+            }).then(function () {
+                $state.go('question', { isDaily: false });
+            });
+            $cordovaLocalNotification.clearAll();
+        });*/
 
         fireRef.onAuth(authDataCallback);
     });
 
+    function registerNotifications() {
+        var fireRef = new Firebase("https://medpager.firebaseio.com");
+        var schedule = $firebaseArray(fireRef.child('schedule'));
+        if (!$localStorage.lastNotification) {
+            $localStorage.lastNotification = 0;
+        }
+        schedule.$loaded(function (data) {
+            var now = new Date().getTime();
+            data.forEach(function (item) {
+                var stime = moment(item.$value).toDate();
+                if ($localStorage.lastNotification < stime.getTime()) {
+                    var event = {
+                        id: item.$id,
+                        at: stime,
+                        title: "New page!",
+                        message: "You have received a new page to answer.",
+                        sound: "file://sounds/page.aif",
+                    };
+                    /*$cordovaLocalNotification.schedule(event).then(function () {
+                        $localStorage.lastNotification = stime.getTime();
+                    });*/
+
+                }
+            })
+        });
+    }
 });
+

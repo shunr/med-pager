@@ -15,7 +15,33 @@ $royal:                           #886aea !default;
 $dark:                            #444 !default;
 */
 
-$positive:                        #1976D2 !default;
+$positive:                      #34699E;
+$assertive:                     #F44336;
+$dark: 							#37474F;
+$calm:                          transparent;
+
+// The path for our ionicons font files, relative to the built CSS in www/css
+$ionicons-font-path: "../lib/ionic/fonts" !default;
+
+// Other styles
+$bar-height:                      56px;
+$bar-title-font-size:             17px;
+$item-icon-font-size:             26px;
+$bar-padding-portrait: 0;
+//$bar-positive-border:             transparent !default;
+
+$modal-inset-mode-top:            0;
+$modal-inset-mode-right:          0;
+$modal-inset-mode-bottom:         0;
+$modal-inset-mode-left:           0;
+$modal-inset-mode-min-height:     100%;
+
+$menu-bg:                         $dark;
+$menu-side-shadow:                0 0 8px rgba(0,0,0,0.4);
+$badge-border-radius:             100%;
+$badge-font-weight:               300;
+$tabs-height:                     56px;
+$tabs-striped-border-width:       0px;
 
 // The path for our ionicons font files, relative to the built CSS in www/css
 $ionicons-font-path: "../lib/ionic/fonts" !default;

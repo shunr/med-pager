@@ -1,11 +1,22 @@
-﻿var ctrl = angular.module('pager.menu', ['firebase', 'ui.router', 'ngStorage', 'pager.question'])
+﻿var app = angular.module('pager.menu', [])
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 var usersRef = fireRef.child('users');
 
-ctrl.controller('menuControl', function ($scope, $firebaseObject, $ionicHistory, $ionicPopup, $state, $cordovaLocalNotification, $localStorage, $cordovaStatusbar, $ionicPlatform, questionService) {
+app.controller('menuControl', function (
+    $scope,
+    $firebaseObject,
+    $ionicHistory,
+    $ionicPopup,
+    $state,
+    $cordovaLocalNotification,
+    $localStorage,
+    $cordovaStatusbar,
+    $ionicPlatform,
+    $ionicModal,
+    questionService) {
 
     $scope.title = "MOC Pager";
-    $scope.storage = $localStorage
+    $scope.storage = $localStorage;
 
     /*$scope.$on('$ionicView.enter', function () {
         if ($ionicHistory.currentStateName() == "menu") {
@@ -38,29 +49,15 @@ ctrl.controller('menuControl', function ($scope, $firebaseObject, $ionicHistory,
     $scope.logout = function () {
         fireRef.unauth();
         $localStorage.$reset();
-        $cordovaLocalNotification.clearAll()
-        $cordovaLocalNotification.cancelAll()
+        console.log("nope");
+        /*$cordovaLocalNotification.clearAll()
+        $cordovaLocalNotification.cancelAll()*/
     }
 
     //Set the title of the page to match selected tab
     $scope.titleChange = function (newTitle) {
         $scope.title = newTitle;
     }
-
-    /*$scope.test = function () {
-        var alarmTime = new Date();
-        alarmTime.setSeconds(alarmTime.getSeconds() + 10);
-        $cordovaLocalNotification.add({
-            id: "1234",
-            date: alarmTime,
-            message: "This is a message",
-            title: "This is a title",
-            autoCancel: true,
-            sound: null
-        }).then(function () {
-            console.log("The notification has been set");
-        });
-    }*/
 
     $scope.range = function (count) {
         return new Array(count);
@@ -75,4 +72,41 @@ ctrl.controller('menuControl', function ($scope, $firebaseObject, $ionicHistory,
         $state.go('question', { isDaily: daily });
     }
 
+    $scope.$storage = $localStorage.$default({
+        user: {}
+    });
+
+    // MENU VISUAL THINGS
+    $scope.views = [
+        { name: "info", ref: "infor" + $scope.$storage.user.uid, icon: "ion-android-home" },
+        { name: "patients", ref: "patients", icon: "ion-android-people" },
+        { name: "daily", ref: "daily", icon: "ion-android-calendar" },
+    ];
+
+    // Highlight current view in menu
+    $scope.isViewSelected = function (name) {
+        if ($ionicHistory.currentStateName() == 'menu.' + name) {
+            return true
+        } else {
+            return false
+        }
+    };
+
+    // Settings modal open
+    $ionicModal.fromTemplateUrl('settingsModal.html',
+        function (modal) {
+            $scope.settingsModal = modal;
+        }, {
+            scope: $scope,
+            animation: 'slide-in-right',
+            focusFirstInput: true
+        });
+
+});
+
+// Settings modal
+app.controller('settingsModalCtrl', function ($scope) {
+    $scope.hideModal = function () {
+        $scope.settingsModal.hide();
+    };
 });

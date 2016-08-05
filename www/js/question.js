@@ -1,4 +1,4 @@
-﻿var ctrl = angular.module('pager.question', ['firebase', 'ui.router', 'timer', 'ngStorage'])
+﻿var ctrl = angular.module('pager.question', [])
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 var usersRef = fireRef.child('users');
 
@@ -32,7 +32,6 @@ ctrl.factory('questionService', ['$firebaseObject', '$localStorage', function ($
                 choiceRef.child($localStorage.user.sid).child('isChoiceCorrect').set(ans == data.$value);
             });
 
-
             //!TODO! make failsafe in case user becomes unauthed during submission
         },
         //save an array of the keys of all teh questions in the firebase that the user has not answered.
@@ -57,7 +56,6 @@ ctrl.factory('questionService', ['$firebaseObject', '$localStorage', function ($
                 })
             });
         },
-
     };
 }]);
 
@@ -72,38 +70,37 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
     //trigger event when time runs out to auto send and go to next page
     $scope.timeUp = function () {
         if ($scope.questionRef.$id !== undefined) {
-            if ($scope.question.choices.selected) {
-                questionService.setAnswer($scope.questionRef.$id, $scope.question.choices.selected, $stateParams.isDaily);
+            if ($scope.question.selectedChoice) {
+                questionService.setAnswer($scope.questionRef.$id, $scope.question.selectedChoice, $stateParams.isDaily);
             }
             questionService.saveAvailableQuestions();
             $scope.$broadcast('timer-stop');
             $ionicViewSwitcher.nextDirection('forward');
             $state.go('choice', { questionRef: $scope.questionRef.$id });
             $ionicHistory.clearHistory();
-            console.log('TIMEOUT - Forcibly submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.choices.selected);
+            //console.log('TIMEOUT - Forcibly submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.selectedChoice);
         } else {
             $scope.$broadcast('timer-stop');
         }
     }
 
     $scope.submitQuestion = function () {
-        if ($scope.question.choices.selected != undefined) {
+        if ($scope.question.selectedChoice != undefined) {
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Submit Answer ' + $scope.questionRef.$id,
                 template: 'Are you sure you want to submit your answer?'
             });
             confirmPopup.then(function (res) {
                 if (res) {
-                    //push answer to firebase
-                    questionService.setAnswer($scope.questionRef.$id, $scope.question.choices.selected, $stateParams.isDaily);
+                    // Push answer to firebase
+                    console.log($scope.question.selectedChoice);
+                    questionService.setAnswer($scope.questionRef.$id, $scope.question.selectedChoice, $stateParams.isDaily);
                     questionService.saveAvailableQuestions();
                     $scope.$broadcast('timer-stop');
                     $ionicViewSwitcher.nextDirection('forward');
                     $state.go('choice', { questionRef: $scope.questionRef.$id });
                     $ionicHistory.clearHistory();
-                    console.log('Submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.choices.selected);
-                } else {
-                    //cancel
+                    //console.log('Submitted answer to ' + $scope.questionRef.$id + ": " + $scope.question.selectedChoice);
                 }
             });
         } else {
@@ -127,12 +124,11 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
         }
     }
 
-    //!TEMP! generate new question for testing
+    // Generate new question
     $scope.newQuestion = function () {
         var qq = questionService.getQuestion();
         $scope.questionRef = $firebaseObject(qq);
         $scope.questionRef.$loaded(function (data) {
-            console.log(data)
             $scope.question.choices = $firebaseArray(qq.child('choices'));
             $scope.question.text = parseText(data.question);
             $scope.question.image = parseImage(data.question);
@@ -146,15 +142,15 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
         //generate newquestion if on question page
         if ($ionicHistory.currentStateName() == "question") {
             $scope.newQuestion($stateParams.isDaily);
-            if ($cordovaStatusbar) {
+            /*if ($cordovaStatusbar) {
                 $cordovaStatusbar.hide();
-            }
+            }*/
         }
     });
 
     /*$ionicPlatform.ready(function () {
         if ($cordovaStatusbar) {
-            if ($ionicHistory.currentStateName() == "menu" || $ionicHistory.currentStateName() == "login" || $ionicHistory.currentStateName() == "signup") {
+            if ($ionicHistory.currentStateName().substring("menu") > -1 || $ionicHistory.currentStateName() == "login" || $ionicHistory.currentStateName() == "signup") {
                 $cordovaStatusbar.show();
             } else {
                 $cordovaStatusbar.hide();
@@ -164,15 +160,15 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
 
     //Post-questionnaire choices
     $scope.question.choices = [
-    { text: "Give a verbal order over the phone, no need to see the patient.", value: "A" },
-    { text: "See the patient when you have time (1-2 hrs) and write an order then.", value: "B" },
-    { text: "See the patient immediately.", value: "C" },
-    { text: "Call the senior (who is at home) for help.", value: "D" },
-    { text: "Call the appropriate service for help (e.g. RACE, Anesthesia, Internal Med, etc.)", value: "E" }
+        { text: "Give a verbal order over the phone, no need to see the patient.", value: "A" },
+        { text: "See the patient when you have time (1-2 hrs) and write an order then.", value: "B" },
+        { text: "See the patient immediately.", value: "C" },
+        { text: "Call the senior (who is at home) for help.", value: "D" },
+        { text: "Call the appropriate service for help (e.g. RACE, Anesthesia, Internal Med, etc.)", value: "E" }
     ];
 
     //Set selected choice to user selection
-    $scope.question.choices.selected = {};
+    $scope.question.selectedChoice = {};
 
     $scope.submitChoice = function () {
         var confirmPopup = $ionicPopup.confirm({
@@ -182,17 +178,14 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
         confirmPopup.then(function (res) {
             if (res) {
                 //push choice to firebase
-                questionService.setChoice($stateParams.questionRef, $scope.question.choices.selected);
+                questionService.setChoice($stateParams.questionRef, $scope.question.selectedChoice);
                 $ionicViewSwitcher.nextDirection('forward');
                 $ionicHistory.clearHistory();
-                console.log('Submitted choice to ' + $stateParams.questionRef + ": " + $scope.question.choices.selected);
-                $state.go('menu');
-                if ($cordovaStatusbar) {
+                //console.log('Submitted choice to ' + $stateParams.questionRef + ": " + $scope.question.selectedChoice);
+                $state.go('menu.info');
+                /*if ($cordovaStatusbar) {
                     $cordovaStatusbar.show();
-                }
-            } else {
-                //cancel
-                console.log('You are not sure');
+                }*/
             }
         });
     };

@@ -1,0 +1,22 @@
+<ion-view title='{{title}}' ng-controller="menuControl">
+    <ion-tabs class="tabs-striped tabs-icon-top tabs-positive">
+
+        <ion-tab title="Overview" icon="ion-ios-information" on-select="titleChange('Overview')">
+            <ion-content padding="true" class="has-header menu-screen dark">
+
+            </ion-content>
+        </ion-tab>
+
+        <ion-tab title="Daily" icon="ion-ios-calendar-outline" on-select="titleChange('Daily Questions')">
+            <ion-content padding="true" class="has-header menu-screen">
+
+            </ion-content>
+
+        </ion-tab>
+
+        <ion-tab title="Settings" icon="ion-ios-gear" on-select="titleChange('Settings')">
+
+        </ion-tab>
+
+    </ion-tabs>
+</ion-view>

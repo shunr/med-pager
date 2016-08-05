@@ -15,8 +15,7 @@
 
     <ion-content padding="true" scroll="true" class="question-screen">
 
-        <div class="list card">
-
+        <div class="list item-card card">
             <div class="item item-text-wrap">
                 <p>
                     How would you like to respond to this page?
@@ -24,11 +23,12 @@
             </div>
         </div>
 
-        <div class="list card item-text-wrap">
-            <ion-radio ng-repeat="item in question.choices"
-                       ng-value="item.value"
-                       ng-model="question.choices.selected">
+        <div class="list item-card card item-text-wrap">
+            <ion-radio ng-repeat="item in question.choices" ng-value="item.value" ng-model="$parent.question.selectedChoice">
                 {{ item.text }}
+            </ion-radio>
+            <ion-radio ng-value="'X'" ng-model="question.selectedChoice">
+                I'm not sure
             </ion-radio>
         </div>
 

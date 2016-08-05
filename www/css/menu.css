@@ -1,0 +1,184 @@
+
+.bar-header.expanded {
+    top: 6px;
+    min-height:182px;
+    position:absolute;
+}
+
+.has-expanded-header {
+    top:200px !important;
+}
+
+.bar-header.expanded .item.avatar {
+    padding: 0;
+    position:absolute;
+    margin: 0;
+    top: 28px;
+    left: 50%;
+    margin-left:-38px;
+    height:76px;
+    width:76px;
+    border-radius:100%;
+    border-width: 2px;
+    border-color: #fff;
+}
+
+.bar-header.expanded .headerText {
+    margin: 0;
+    left: 0 !important;
+    width:100%;
+    text-align:center;
+    font-size: 1.2em;
+    display: block;
+    height: auto;
+    line-height:1.2em;
+    top: 122px;
+}
+
+.bar-header.expanded .headerText span {
+    font-weight: 300;
+    font-size: 0.85em;
+    color: rgba(255,255,255,0.6);
+}
+
+.menu .buttons {
+    top:0;
+    height: 100%;
+    width: 100%;
+}
+
+.menu .buttons .button {
+    position: absolute;
+    top:50px;
+    width: 36px;
+    height: 36px;
+    padding: 2px!important;
+    border-radius: 100px;
+}
+
+.menu .buttons .button-settings {
+    left: 100%;
+    margin-left: -72px;
+}
+
+.menu .buttons .button-user {
+    left: 0;
+    margin-left: 36px;
+}
+
+.item.expanded::after {
+    content:'';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 75%;
+    background-color: transparent;
+    height: 1px;
+}
+
+.item.menu-selected::after {
+    content:'';
+    position: absolute;
+    top: 24px;
+    left: -6px;
+    width: 12px;
+    background-color: #fff;
+    height: 12px;
+    border-radius: 12px;
+    animation: fadeIn 0.5s;
+}
+
+.menu .item-content {
+    padding-left: 32px!important;
+}
+
+.menu .item .button {
+    font-weight:300 !important;
+    text-transform: capitalize;
+}
+
+.bar-header .left-buttons {
+    padding: 4px!important;
+}
+
+.bar-header .left-buttons .button {
+    height: 48px;
+    max-height: none;
+    min-height: 0;
+    min-width: 0;
+    width: 48px;
+    border-radius:100%;
+}
+.no-padding {
+    padding: 0 !important;
+}
+
+.padding-small {
+    padding: 0.7em !important;
+}
+
+.no-margin-bottom {
+    margin-bottom: 0 !important;
+}
+
+.no-margin {
+    margin: 0 !important;
+}
+
+.no-top {
+    top: 0 !important;
+}
+
+.fill {
+    padding: 2em 1em 2em 1em;
+}
+
+.item-card {
+    box-shadow: none !important;
+    border: 1px solid #DDD!important;
+    border-bottom: 2px solid #BBB !important;
+    border-radius: 3px !important;
+}
+
+.item.wrap, .item-content.wrap {
+    white-space: normal;
+}
+
+.bg-transparent {
+    background-color:transparent !important;
+}
+
+.bar-header .left-buttons {
+    padding:8px 12px 8px 12px;
+}
+
+.bar-header .button:before {
+    font-size:24px !important;
+    line-height:30px !important;
+}
+
+.badge {
+    position: absolute!important;
+}
+
+.menu .item-content {
+    padding: 8px 40px!important;
+}
+
+.slide-in-right {
+  -webkit-transform: translateX(100%);
+    transform: translateX(100%); }
+
+.slide-in-right.ng-enter, .slide-in-right > .ng-enter {
+  -webkit-transition: all cubic-bezier(0.1, 0.7, 0.1, 1) 400ms;
+  transition: all cubic-bezier(0.1, 0.7, 0.1, 1) 400ms; }
+
+.slide-in-right.ng-enter-active, .slide-in-right > .ng-enter-active {
+  -webkit-transform: translateX(0);
+    transform: translateX(0); }
+
+.slide-in-right.ng-leave, .slide-in-right > .ng-leave {
+  -webkit-transition: all ease-in-out 250ms;
+  transition: all ease-in-out 250ms; }

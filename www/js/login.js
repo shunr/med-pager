@@ -1,4 +1,4 @@
-﻿var ctrl = angular.module('pager.login', ['firebase', 'ui.router', 'ngStorage', 'pager.question'])
+﻿var ctrl = angular.module('pager.login', [])
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 
 //service for authenticating the user and storing in localStorage
@@ -15,18 +15,15 @@ ctrl.factory('$authService', ['$firebaseObject', '$localStorage', '$state', '$io
                         console.log('Authenticated as ' + $localStorage.user.email)
                         $ionicHistory.clearHistory();
                         $ionicViewSwitcher.nextDirection('forward');
-                        if ($ionicHistory.currentStateName() != "question") {
-                            $state.go('menu');
-                        }
+                        $state.go('menu.info');
                     });
-
-                }
-            );
+                });
         },
         clearLocalUser: function () {
             $localStorage.user = null;
             $ionicViewSwitcher.nextDirection('back');
             $state.go('login');
+            $localStorage.$reset();
             $ionicHistory.clearHistory();
         }
     }
@@ -107,7 +104,7 @@ ctrl.controller('signupControl', function ($scope, $firebaseObject, $ionicPopup,
                         registrationError(error);
                     } else {
                         //if firebase registration success, write new user to database with permissions from previous authentication
-                        usersRef.child(sid).set({ name: name, email: email, sid: sid, dailyQuestions: 8});
+                        usersRef.child(sid).set({ name: name, email: email, sid: sid, dailyQuestions: 8 });
                         //hooray message
                         $ionicPopup.alert({
                             title: 'Success',
@@ -115,7 +112,7 @@ ctrl.controller('signupControl', function ($scope, $firebaseObject, $ionicPopup,
                         });
                         //Go to menu
                         $ionicViewSwitcher.nextDirection('forward');
-                        $state.go('menu');
+                        $state.go('menu.info');
                     }
                 });
             }
