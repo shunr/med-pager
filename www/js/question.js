@@ -1,4 +1,4 @@
-﻿var ctrl = angular.module('pager.question', [])
+﻿var ctrl = angular.module('pager.question', []);
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 var usersRef = fireRef.child('users');
 
@@ -93,7 +93,6 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
             confirmPopup.then(function (res) {
                 if (res) {
                     // Push answer to firebase
-                    console.log($scope.question.selectedChoice);
                     questionService.setAnswer($scope.questionRef.$id, $scope.question.selectedChoice, $stateParams.isDaily);
                     questionService.saveAvailableQuestions();
                     $scope.$broadcast('timer-stop');

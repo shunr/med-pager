@@ -23,8 +23,12 @@ ctrl.factory('$authService', ['$firebaseObject', '$localStorage', '$state', '$io
             $localStorage.user = null;
             $ionicViewSwitcher.nextDirection('back');
             $state.go('login');
+            var dtime = $localStorage.dailyTime;
             $localStorage.$reset();
+            $localStorage.dailyTime = dtime;
             $ionicHistory.clearHistory();
+            /*$cordovaLocalNotification.clearAll()
+            $cordovaLocalNotification.cancelAll()*/
         }
     }
 }]);

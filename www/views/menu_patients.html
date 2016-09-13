@@ -1,5 +1,29 @@
-<ion-view view-title="Your Patients" hide-back-button="true" nav-bar-class="bar-positive" class="bg bg-poly">
-    <ion-content padding="true">
-
+<ion-view view-title="Your Patients" hide-back-button="true" class="no-padding bg-dark">
+    <ion-content>
+        <div class="list list-inset">
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="text" placeholder="Search" ng-model="patientSearch">
+            </label>
+        </div>
+        <ion-list ng-repeat="(service, list) in patients">
+            <div class="item item-divider item-positive text-center">
+                {{service}}
+            </div>
+            <div class="list card item-card" ng-repeat="patient in list | filter: patientSearch">
+                <div class="item bg bg-poly item-text-wrap">
+                    <strong>{{patient.name}} ({{patient.ageGender}})</strong> <span class="pull-right">{{patient.room}}</span>
+                </div>
+                <div class="item item-text-wrap">
+                    <i class="ion ion-clipboard translucent"></i>&nbsp;&nbsp;{{patient.admittedWith}}
+                </div>
+                <div class="item item-text-wrap">
+                    <i class="ion ion-medkit translucent"></i>&nbsp;&nbsp;{{patient.PMHx}}
+                </div>
+                <div ng-if="patient.issues" class="item item-text-wrap">
+                    <i class="ion ion-android-warning translucent"></i>&nbsp;&nbsp;{{patient.issues}}
+                </div>
+            </div>
+        </ion-list>
     </ion-content>
 </ion-view>

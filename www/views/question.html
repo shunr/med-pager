@@ -12,10 +12,10 @@
         </timer>
     </ion-header-bar>
 
-    <ion-content padding="true" scroll="true" class="question-screen">
+    <ion-content padding="true" scroll="true" class="bg bg-poly">
         <div class="item-card list card">
-            <div class=" item item-text-wrap">
-                <img ng-if="question.image" ng-src="{{question.image}}" class="full-image">
+            <img ng-if="question.image" ng-src="{{question.image}}" class="full-image">
+            <div class=" item item-text-wrap">  
                 <p align="justify">
                     {{question.text}}
                 </p>

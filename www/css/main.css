@@ -16,18 +16,31 @@ body .overflow-scroll {
     margin:0;
     display:block;
 }
-
-.login-screen{
-    background-image:url("../img/login.jpg");
+.bg {
     background-size:cover;
+    background-position:center;
 }
-
-.question-screen{
+.bg-login {
     background-image:url("../img/login.jpg");
-    background-size:cover;
 }
-
-.menu-screen{
-    background-image:url("../img/login.jpg");
-    background-size:cover;
+.bg-poly {
+    background-image:url("../img/question.jpg");
+}
+.bg-dark {
+    background-color: #37474F!important;
+}
+.item.wrap, .item-content.wrap {
+    white-space: normal;
+}
+.text-small {
+    font-size: 80%;
+}
+.translucent {
+    opacity: 0.8
+}
+.pull-right {
+    float:right;
+}
+.borderless {
+    border: none;
 }

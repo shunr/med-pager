@@ -2,7 +2,17 @@
 // LINE 71
 // LINE 100
 
-var app = angular.module('pager', ['ionic', 'ngCordova', 'ngStorage', 'firebase', 'timer', 'pager.question', 'pager.login', 'pager.menu', 'ui.router'])
+var app = angular.module('pager', [
+    'ionic',
+    'ngCordova',
+    'ngStorage',
+    'firebase',
+    'timer',
+    'pager.question',
+    'pager.login',
+    'pager.menu',
+    'pager.utils',
+    'ui.router'])
 
 app.run(function ($ionicPlatform, $cordovaStatusbar) {
     $ionicPlatform.ready(function () {
@@ -10,6 +20,7 @@ app.run(function ($ionicPlatform, $cordovaStatusbar) {
         // for form inputs)
         /*if (window.cordova && window.cordova.plugins.Keyboard) {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+            cordova.plugins.Keyboard.disableScroll(true);
         }
         if ($cordovaStatusbar) {
             $cordovaStatusbar.overlaysWebView(true);
