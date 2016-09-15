@@ -1,10 +1,13 @@
 <ion-view title="Question" hide-nav-bar="true" ng-controller="questionControl" cache-view="false">
     <ion-header-bar style="display:block; padding:0">
-        <timer id="countdown-timer" countdown="countdown" finish-callback="timeUp()" ng-model="timer" interval="1000">
-            <div class="item item-avatar">
+        <timer id="countdown-timer" countdown="countdown" finish-callback="timeUp()" ng-model="timer" interval="10000">
+            <div class="item item-avatar item-button-right">
                 <img src="img/ionic.png">
                 <h2>Time left</h2>
                 <p>{{seconds}} second{{secondsS}}</p>
+                <button ng-click="toggleUnsure()" ng-class="{'button-energized': question.unsure}" class="button button-clear button-unsure">
+                    <i class="icon ion-android-star"></i>
+                </button>
             </div>
             <div class="timer-bar" style="width: {{seconds/60 * 100}}%; display:block">
                 <div class="item item-positive"></div>
@@ -15,7 +18,7 @@
     <ion-content padding="true" scroll="true" class="bg bg-poly">
         <div class="item-card list card">
             <img ng-if="question.image" ng-src="{{question.image}}" class="full-image">
-            <div class=" item item-text-wrap">  
+            <div class=" item item-text-wrap">
                 <p align="justify">
                     {{question.text}}
                 </p>
@@ -24,9 +27,6 @@
         <div class="item-card list card item-text-wrap">
             <ion-radio ng-repeat="item in question.choices" ng-value="item.$id" ng-model="$parent.question.selectedChoice">
                 {{ item.$value }}
-            </ion-radio>
-            <ion-radio ng-value="'X'" ng-model="question.selectedChoice">
-                I'm not sure
             </ion-radio>
         </div>
         <button ng-click="submitQuestion()" class="button button-block button-positive">Submit</button>

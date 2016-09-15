@@ -16,6 +16,14 @@ body .overflow-scroll {
     margin:0;
     display:block;
 }
+
+.button-unsure {
+    max-height: none!important;
+    right: 16px!important;
+    top: 8px!important;
+    bottom: 8px!important;
+}
+
 .bg {
     background-size:cover;
     background-position:center;

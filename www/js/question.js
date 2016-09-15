@@ -1,9 +1,9 @@
 ﻿var ctrl = angular.module('pager.question', []);
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 var usersRef = fireRef.child('users');
+var staticRef = fireRef.child('static');
 
 ctrl.factory('questionService', ['$firebaseObject', '$localStorage', function ($firebaseObject, $localStorage, $scope) {
-    //$scope.user = $localStorage.getObject('user');
     return {
         //grab a question from ones not answered
         getQuestion: function () {
@@ -11,14 +11,23 @@ ctrl.factory('questionService', ['$firebaseObject', '$localStorage', function ($
             return fireRef.child('pagerQuestions').child($localStorage.availableQuestions[randIndex])
         },
         //push question answer to appropriate location on firebase user
-        setAnswer: function (qref, ans, isDaily) {
+        setAnswer: function (qref, ans, isDaily, unsure) {
             var useransRef = usersRef.child($localStorage.user.sid).child('responses');
-            useransRef.child(qref).set(true);
             var answersRef = fireRef.child('answers').child(qref);
-            answersRef.child($localStorage.user.sid).child('answer').set(ans);
-            answersRef.child($localStorage.user.sid).child('isDaily').set(isDaily);
-            answersRef.child($localStorage.user.sid).child('time').set(Firebase.ServerValue.TIMESTAMP);
+            var starredRef = fireRef.child('starred').child(qref);
             var answerObj = $firebaseObject(fireRef.child('pagerQuestions').child(qref).child('answers').child('first'));
+            useransRef.child(qref).set(true);
+            if (unsure) {
+                starredRef.transaction(function (starred) {
+                    return starred + 1;
+                });
+            }
+            answersRef.child($localStorage.user.sid).set({
+                'answer': ans,
+                'isDaily': isDaily,
+                'unsure': unsure,
+                'time': Firebase.ServerValue.TIMESTAMP
+            })
             answerObj.$loaded(function (data) {
                 answersRef.child($localStorage.user.sid).child('isCorrect').set(ans == data.$value);
             });
@@ -60,18 +69,36 @@ ctrl.factory('questionService', ['$firebaseObject', '$localStorage', function ($
 }]);
 
 
-ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionicPlatform, $cordovaStatusbar, $ionicViewSwitcher, $localStorage, $ionicHistory, $stateParams, $firebaseArray, $firebaseObject, questionService) {
+ctrl.controller('questionControl', function (
+    $scope,
+    $ionicPopup,
+    $state,
+    $ionicPlatform,
+    $cordovaStatusbar,
+    $ionicViewSwitcher,
+    $localStorage,
+    $ionicHistory,
+    $stateParams,
+    $firebaseArray,
+    $firebaseObject,
+    $firebaseUtils,
+    questionService) {
 
     $scope.question = {};
     $scope.questionRef = {};
     $scope.countdown = 60;
     $scope.selected = {};
+    $scope.$storage = $localStorage
 
     //trigger event when time runs out to auto send and go to next page
     $scope.timeUp = function () {
         if ($scope.questionRef.$id !== undefined) {
             if ($scope.question.selectedChoice) {
-                questionService.setAnswer($scope.questionRef.$id, $scope.question.selectedChoice, $stateParams.isDaily);
+                questionService.setAnswer(
+                    $scope.questionRef.$id,
+                    $scope.question.selectedChoice,
+                    $stateParams.isDaily,
+                    $scope.question.unsure);
             }
             questionService.saveAvailableQuestions();
             $scope.$broadcast('timer-stop');
@@ -93,7 +120,11 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
             confirmPopup.then(function (res) {
                 if (res) {
                     // Push answer to firebase
-                    questionService.setAnswer($scope.questionRef.$id, $scope.question.selectedChoice, $stateParams.isDaily);
+                    questionService.setAnswer(
+                        $scope.questionRef.$id,
+                        $scope.question.selectedChoice,
+                        $stateParams.isDaily,
+                        $scope.question.unsure);
                     questionService.saveAvailableQuestions();
                     $scope.$broadcast('timer-stop');
                     $ionicViewSwitcher.nextDirection('forward');
@@ -123,6 +154,10 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
         }
     }
 
+    $scope.toggleUnsure = function () {
+        $scope.question.unsure = !$scope.question.unsure;
+    }
+
     // Generate new question
     $scope.newQuestion = function () {
         var qq = questionService.getQuestion();
@@ -131,6 +166,7 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
             $scope.question.choices = $firebaseArray(qq.child('choices'));
             $scope.question.text = parseText(data.question);
             $scope.question.image = parseImage(data.question);
+            $scope.question.unsure = false;
             $scope.$broadcast('timer-set-countdown-seconds', $scope.countdown);
             $scope.$broadcast('timer-start');
         });
@@ -158,13 +194,10 @@ ctrl.controller('questionControl', function ($scope, $ionicPopup, $state, $ionic
     });*/
 
     //Post-questionnaire choices
-    $scope.question.choices = [
-        { text: "Give a verbal order over the phone, no need to see the patient.", value: "A" },
-        { text: "See the patient when you have time (1-2 hrs) and write an order then.", value: "B" },
-        { text: "See the patient immediately.", value: "C" },
-        { text: "Call the senior (who is at home) for help.", value: "D" },
-        { text: "Call the appropriate service for help (e.g. RACE, Anesthesia, Internal Med, etc.)", value: "E" }
-    ];
+    var choices = $firebaseArray(staticRef.child("followup"));
+    choices.$loaded(function (data) {
+        $scope.$storage.followup = $firebaseUtils.toJSON(data);
+    });
 
     //Set selected choice to user selection
     $scope.question.selectedChoice = {};

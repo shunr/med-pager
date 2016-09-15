@@ -6,7 +6,7 @@
                 <input type="text" placeholder="Search" ng-model="patientSearch">
             </label>
         </div>
-        <ion-list ng-repeat="(service, list) in patients">
+        <ion-list ng-repeat="(service, list) in $storage.static.patients">
             <div class="item item-divider item-positive text-center">
                 {{service}}
             </div>

@@ -24,11 +24,8 @@
         </div>
 
         <div class="list item-card card item-text-wrap">
-            <ion-radio ng-repeat="item in question.choices" ng-value="item.value" ng-model="$parent.question.selectedChoice">
+            <ion-radio ng-repeat="item in $storage.followup" ng-value="item.value" ng-model="$parent.question.selectedChoice">
                 {{ item.text }}
-            </ion-radio>
-            <ion-radio ng-value="'X'" ng-model="question.selectedChoice">
-                I'm not sure
             </ion-radio>
         </div>
 
