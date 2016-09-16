@@ -18,13 +18,13 @@ app.controller('menuControl', function (
     $scope.title = "MOC Pager";
     $scope.storage = $localStorage;
 
-    /*$scope.$on('$ionicView.enter', function () {
+    $scope.$on('$ionicView.enter', function () {
         if ($ionicHistory.currentStateName() == "menu") {
             if ($cordovaStatusbar) {
                 $cordovaStatusbar.style(1);
             }
         }
-    });*/
+    });
 
     $scope.$watch('storage.user', function (val) {
         if (val) {
@@ -106,7 +106,6 @@ app.controller('menuControl', function (
             animation: 'slide-in-up',
             focusFirstInput: true
         });
-
 });
 
 // Settings modal

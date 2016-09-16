@@ -43,7 +43,7 @@ ctrl.factory('questionService', ['$firebaseObject', '$localStorage', function ($
 
             //!TODO! make failsafe in case user becomes unauthed during submission
         },
-        //save an array of the keys of all teh questions in the firebase that the user has not answered.
+        //save an array of the keys of all the questions in the firebase that the user has not answered.
         saveAvailableQuestions: function () {
             var userAnswers = $firebaseObject(usersRef.child($localStorage.user.sid).child('responses'));
             var availableQuestions = [];
@@ -112,7 +112,7 @@ ctrl.controller('questionControl', function (
     }
 
     $scope.submitQuestion = function () {
-        if ($scope.question.selectedChoice != undefined) {
+        if ($scope.question.selectedChoice) {
             var confirmPopup = $ionicPopup.confirm({
                 title: 'Submit Answer ' + $scope.questionRef.$id,
                 template: 'Are you sure you want to submit your answer?'
@@ -177,21 +177,11 @@ ctrl.controller('questionControl', function (
         //generate newquestion if on question page
         if ($ionicHistory.currentStateName() == "question") {
             $scope.newQuestion($stateParams.isDaily);
-            /*if ($cordovaStatusbar) {
-                $cordovaStatusbar.hide();
-            }*/
-        }
-    });
-
-    /*$ionicPlatform.ready(function () {
-        if ($cordovaStatusbar) {
-            if ($ionicHistory.currentStateName().substring("menu") > -1 || $ionicHistory.currentStateName() == "login" || $ionicHistory.currentStateName() == "signup") {
-                $cordovaStatusbar.show();
-            } else {
+            if ($cordovaStatusbar) {
                 $cordovaStatusbar.hide();
             }
         }
-    });*/
+    });
 
     //Post-questionnaire choices
     var choices = $firebaseArray(staticRef.child("followup"));
@@ -215,9 +205,9 @@ ctrl.controller('questionControl', function (
                 $ionicHistory.clearHistory();
                 //console.log('Submitted choice to ' + $stateParams.questionRef + ": " + $scope.question.selectedChoice);
                 $state.go('menu.info');
-                /*if ($cordovaStatusbar) {
+                if ($cordovaStatusbar) {
                     $cordovaStatusbar.show();
-                }*/
+                }
             }
         });
     };

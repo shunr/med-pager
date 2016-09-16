@@ -1,6 +1,3 @@
-// LINE 6
-// LINE 71
-// LINE 100
 
 var app = angular.module('pager', [
     'ionic',
@@ -18,13 +15,13 @@ app.run(function ($ionicPlatform, $cordovaStatusbar) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
-        /*if (window.cordova && window.cordova.plugins.Keyboard) {
+        if (window.cordova && window.cordova.plugins.Keyboard) {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
             cordova.plugins.Keyboard.disableScroll(true);
         }
         if ($cordovaStatusbar) {
             $cordovaStatusbar.overlaysWebView(true);
-        }*/
+        }
     });
 })
 
@@ -34,11 +31,6 @@ app.config(function ($stateProvider, $urlRouterProvider) {
             url: '/signup',
             templateUrl: 'views/signup.html'
         })
-
-        /*.state('menu', {
-            url: '/menu',
-            templateUrl: 'views/menu.html'
-        })*/
 
         .state('menu', {
             url: '/menu',
@@ -115,7 +107,7 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localS
             }
         }
 
-        /*cordova.plugins.notification.local.on("click", function (notification) {
+        cordova.plugins.notification.local.on("click", function (notification) {
             $ionicPopup.alert({
                 title: 'New page',
                 template: 'Please answer the following question within the allotted time.'
@@ -123,7 +115,7 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localS
                 $state.go('question', { isDaily: false });
             });
             $cordovaLocalNotification.clearAll();
-        });*/
+        });
 
         fireRef.onAuth(authDataCallback);
     });
@@ -146,10 +138,9 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localS
                         message: "You have received a new page to answer.",
                         sound: "file://sounds/page.aif",
                     };
-                    /*$cordovaLocalNotification.schedule(event).then(function () {
+                    $cordovaLocalNotification.schedule(event).then(function () {
                         $localStorage.lastNotification = stime.getTime();
-                    });*/
-
+                    });
                 }
             })
         });

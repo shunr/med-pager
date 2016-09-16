@@ -2,7 +2,7 @@
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 
 //service for authenticating the user and storing in localStorage
-ctrl.factory('$authService', ['$firebaseObject', '$localStorage', '$state', '$ionicViewSwitcher', '$ionicHistory', 'questionService', function ($firebaseObject, $localStorage, $state, $ionicViewSwitcher, $ionicHistory, questionService) {
+ctrl.factory('$authService', ['$firebaseObject', '$localStorage', '$state', '$ionicViewSwitcher', '$ionicHistory', '$cordovaLocalNotification', 'questionService', function ($firebaseObject, $localStorage, $state, $ionicViewSwitcher, $ionicHistory, $cordovaLocalNotification, questionService) {
     return {
         saveLocalUser: function (authData) {
             var email = authData.password.email;
@@ -27,8 +27,8 @@ ctrl.factory('$authService', ['$firebaseObject', '$localStorage', '$state', '$io
             $localStorage.$reset();
             $localStorage.dailyTime = dtime;
             $ionicHistory.clearHistory();
-            /*$cordovaLocalNotification.clearAll()
-            $cordovaLocalNotification.cancelAll()*/
+            $cordovaLocalNotification.clearAll()
+            $cordovaLocalNotification.cancelAll()
         }
     }
 }]);
@@ -156,8 +156,6 @@ ctrl.controller('signupControl', function ($scope, $firebaseObject, $ionicPopup,
                 //User in firebase/users/ found
                 registrationError('The student ID you entered is already registered to an account.');
             }
-
         });
-
     };
 });
