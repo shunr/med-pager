@@ -15,13 +15,13 @@ app.run(function ($ionicPlatform, $cordovaStatusbar) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
-        if (window.cordova && window.cordova.plugins.Keyboard) {
+        /*if (window.cordova && window.cordova.plugins.Keyboard) {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
             cordova.plugins.Keyboard.disableScroll(true);
         }
         if ($cordovaStatusbar) {
             $cordovaStatusbar.overlaysWebView(true);
-        }
+        }*/
     });
 })
 
@@ -107,7 +107,7 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localS
             }
         }
 
-        cordova.plugins.notification.local.on("click", function (notification) {
+        /*cordova.plugins.notification.local.on("click", function (notification) {
             $ionicPopup.alert({
                 title: 'New page',
                 template: 'Please answer the following question within the allotted time.'
@@ -115,7 +115,7 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localS
                 $state.go('question', { isDaily: false });
             });
             $cordovaLocalNotification.clearAll();
-        });
+        });*/
 
         fireRef.onAuth(authDataCallback);
     });
