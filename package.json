@@ -1,6 +1,6 @@
 {
   "name": "MOC_Pager",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "A pager simulator app used to run an elective course at the University of Ottawa.",
   "dependencies": {
     "gulp": "^3.5.6",
@@ -27,11 +27,6 @@
     "cordova-plugin-app-event"
   ],
   "cordovaPlatforms": [
-    {
-      "platform": "android",
-      "version": "",
-      "locator": "android"
-    },
     {
       "platform": "ios",
       "version": "",
