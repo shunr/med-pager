@@ -6,3 +6,4 @@ platforms/
 plugins/
 cert/
 firebase_backup/
+/.io-config.json
