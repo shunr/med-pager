@@ -29,6 +29,14 @@
                 {{ item.$value }}
             </ion-radio>
         </div>
-        <button ng-click="submitQuestion()" class="button button-block button-positive">Submit</button>
+        <div class="row no-padding">
+            <div class="col">
+                <button ng-click="patientsModal.show()"class="button-outline button-positive button button-block icon ion-ios-people no-margin"></button>
+            </div>
+            <div class="col col-75">
+                <button ng-click="submitQuestion()" class="button button-block button-positive no-margin">Submit</button>
+            </div>
+        </div>
+        <br>
     </ion-content>
 </ion-view>

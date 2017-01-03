@@ -1,0 +1,9 @@
+<div class="modal bg-dark" ng-controller="patientsModalCtrl">
+    <ion-header-bar class="bar bar-header bar-positive">
+        <span class="left-buttons">
+                <button class="button button-clear button-icon ion-android-arrow-back" ng-click="hideModal()"><i class="icon"></i></button>
+            </span>
+        <h1 class="title">Patients</h1>
+    </ion-header-bar>
+    <div ng-include src="'views/patients_modal.html'"></div>
+</div>

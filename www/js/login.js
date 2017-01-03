@@ -2,7 +2,7 @@
 var fireRef = new Firebase("https://medpager.firebaseio.com");
 
 //service for authenticating the user and storing in localStorage
-ctrl.factory('$authService', ['$firebaseObject', '$localStorage', '$state', '$ionicViewSwitcher', '$ionicHistory', '$cordovaLocalNotification', 'questionService', function ($firebaseObject, $localStorage, $state, $ionicViewSwitcher, $ionicHistory, $cordovaLocalNotification, questionService) {
+ctrl.factory('$authService', ['$firebaseObject', '$localStorage', '$state', '$ionicViewSwitcher', '$ionicHistory', 'questionService', function ($firebaseObject, $localStorage, $state, $ionicViewSwitcher, $ionicHistory, questionService) {
     return {
         saveLocalUser: function (authData) {
             var email = authData.password.email;
@@ -12,7 +12,6 @@ ctrl.factory('$authService', ['$firebaseObject', '$localStorage', '$state', '$io
                     data.forEach(function (child) {
                         $localStorage.user = child;
                         questionService.saveAvailableQuestions();
-                        console.log('Authenticated as ' + $localStorage.user.email)
                         $ionicHistory.clearHistory();
                         $ionicViewSwitcher.nextDirection('forward');
                         $state.go('menu.info');
@@ -27,35 +26,30 @@ ctrl.factory('$authService', ['$firebaseObject', '$localStorage', '$state', '$io
             $localStorage.$reset();
             $localStorage.dailyTime = dtime;
             $ionicHistory.clearHistory();
-            $cordovaLocalNotification.clearAll()
-            $cordovaLocalNotification.cancelAll()
+            cordova.plugins.notification.local.clearAll()
+            cordova.plugins.notification.local.cancelAll()
         }
     }
 }]);
 
 //Controller for signup page & user registration
 ctrl.controller('loginControl', function ($scope, $firebaseObject, $ionicPopup, $state, $ionicViewSwitcher) {
-
     $scope.user = {};
-
-    //display message on error
+    //Display message on error
     function loginError(error) {
         $ionicPopup.alert({
             title: 'Login failed',
             template: error
         });
     }
-
     //Login button press handler
     $scope.loginClick = function () {
-
         //Validate input
         if (!$scope.user.email) {
             return loginError('Please enter a valid email address.');
         } else if (!$scope.user.pass) {
             return loginError('Please enter a password.');
         }
-
         //Authenticate user
         fireRef.authWithPassword({
             email: $scope.user.email,
@@ -70,7 +64,6 @@ ctrl.controller('loginControl', function ($scope, $firebaseObject, $ionicPopup, 
         });
     };
 });
-
 
 //Controller for signup page & user registration
 ctrl.controller('signupControl', function ($scope, $firebaseObject, $ionicPopup, $ionicViewSwitcher, $state) {

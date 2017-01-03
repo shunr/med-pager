@@ -74,10 +74,10 @@ ctrl.controller('questionControl', function (
     $ionicPopup,
     $state,
     $ionicPlatform,
-    $cordovaStatusbar,
     $ionicViewSwitcher,
     $localStorage,
     $ionicHistory,
+    $ionicModal,
     $stateParams,
     $firebaseArray,
     $firebaseObject,
@@ -177,8 +177,8 @@ ctrl.controller('questionControl', function (
         //generate newquestion if on question page
         if ($ionicHistory.currentStateName() == "question") {
             $scope.newQuestion($stateParams.isDaily);
-            if ($cordovaStatusbar) {
-                $cordovaStatusbar.hide();
+            if (window.StatusBar) {
+                StatusBar.hide();
             }
         }
     });
@@ -205,11 +205,25 @@ ctrl.controller('questionControl', function (
                 $ionicHistory.clearHistory();
                 //console.log('Submitted choice to ' + $stateParams.questionRef + ": " + $scope.question.selectedChoice);
                 $state.go('menu.info');
-                if ($cordovaStatusbar) {
-                    $cordovaStatusbar.show();
+                if (window.StatusBar) {
+                    StatusBar.show();
                 }
             }
         });
     };
 
+    // Patients modal open
+    $ionicModal.fromTemplateUrl('views/modals/patients.html', function (modal) {
+        $scope.patientsModal = modal;
+    }, {
+            scope: $scope,
+            animation: 'slide-in-up'
+        });
+});
+
+// Patients modal
+app.controller('patientsModalCtrl', function ($scope) {
+    $scope.hideModal = function () {
+        $scope.patientsModal.hide();
+    };
 });

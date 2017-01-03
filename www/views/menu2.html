@@ -20,7 +20,7 @@
             <div class="buttons">
                 <button class="button button-settings button-stable icon ion-android-settings" ng-click="settingsModal.show()"></button>
                 <ion-item class="item-image avatar"><img src="img/logo.png"></ion-item>
-                <button class="button button-user button-stable icon ion-android-notifications" menu-close ui-sref="menu.daily">
+                <button class="button button-user button-stable icon ion-android-calendar" menu-close ui-sref="menu.daily">
                     <span class="badge badge-assertive">{{user.dailyQuestions}}</span>
                 </button>
             </div>
@@ -58,8 +58,8 @@
         <ion-content padding="true" scroll="false"> 
             <div class="list padding">
             <button ng-click="$parent.logout(); hideModal()" class="button button-assertive button-block">Log out</button>
-            <a ng-click="hideModal()" ui-sref="login" class="button button-assertive button-block">Login</a>
-            <a ng-click="$parent.toQuestion(false); hideModal()" class="button button-assertive button-block">Question</a>
+            <!--<a ng-click="hideModal()" ui-sref="login" class="button button-assertive button-block">Login</a>-->
+            <!--<a ng-click="$parent.toQuestion(false); hideModal()" class="button button-assertive button-block">Question</a>-->
             </div>
         </ion-content>
     </div>

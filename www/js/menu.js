@@ -6,25 +6,15 @@ var staticRef = fireRef.child('static');
 app.controller('menuControl', function (
     $scope,
     $firebaseObject,
-    $firebaseUtils,
     $ionicHistory,
     $ionicPopup,
     $state,
     $localStorage,
-    $cordovaStatusbar,
     $ionicModal,
     questionService) {
 
     $scope.title = "MOC Pager";
     $scope.storage = $localStorage;
-
-    $scope.$on('$ionicView.enter', function () {
-        if ($ionicHistory.currentStateName() == "menu") {
-            if ($cordovaStatusbar) {
-                $cordovaStatusbar.style(1);
-            }
-        }
-    });
 
     $scope.$watch('storage.user', function (val) {
         if (val) {
@@ -73,7 +63,7 @@ app.controller('menuControl', function (
 
     // MENU VISUAL THINGS
     $scope.views = [
-        { name: "info", ref: "info" + $scope.$storage.user.uid, icon: "ion-android-home" },
+        { name: "info", ref: "info", icon: "ion-ios-information" },
         { name: "patients", ref: "patients", icon: "ion-android-people" },
         { name: "daily", ref: "daily", icon: "ion-android-calendar" },
     ];
@@ -87,15 +77,7 @@ app.controller('menuControl', function (
         }
     };
 
-    var instructions = $firebaseObject(staticRef.child("instructions"));
-    instructions.$loaded(function (data) {
-        $scope.$storage.static.instructions = data.$value;
-    });
-
-    var patients = $firebaseObject(staticRef.child("patients"));
-    patients.$loaded(function (data) {
-        $scope.$storage.static.patients = $firebaseUtils.toJSON(data);
-    });
+    $scope.instructions = $firebaseObject(staticRef.child("instructions"));
 
     // Settings modal open
     $ionicModal.fromTemplateUrl('settingsModal.html',
@@ -106,6 +88,16 @@ app.controller('menuControl', function (
             animation: 'slide-in-up',
             focusFirstInput: true
         });
+});
+
+// Settings modal
+app.controller('patientsCtrl', function ($scope, $localStorage, $firebaseObject, $firebaseUtils) {
+    $scope.modal = {};
+    $scope.modal.$storage = $localStorage;
+    var patients = $firebaseObject(staticRef.child("patients"));
+    patients.$loaded(function (data) {
+        $scope.modal.$storage.static.patients = $firebaseUtils.toJSON(data);
+    });
 });
 
 // Settings modal

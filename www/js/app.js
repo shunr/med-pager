@@ -1,7 +1,6 @@
 
 var app = angular.module('pager', [
     'ionic',
-    'ngCordova',
     'ngStorage',
     'firebase',
     'timer',
@@ -11,16 +10,11 @@ var app = angular.module('pager', [
     'pager.utils',
     'ui.router'])
 
-app.run(function ($ionicPlatform, $cordovaStatusbar) {
+app.run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
-        // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-        // for form inputs)
-        if (window.cordova && window.cordova.plugins.Keyboard) {
+        if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
             cordova.plugins.Keyboard.disableScroll(true);
-        }
-        if ($cordovaStatusbar) {
-            $cordovaStatusbar.overlaysWebView(true);
         }
     });
 })
@@ -89,12 +83,11 @@ app.config(function ($stateProvider, $urlRouterProvider) {
                 questionRef: "",
             }
         });
-
     $urlRouterProvider.otherwise('menu/info');
 
 });
 
-app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localStorage, $authService, $state, $cordovaLocalNotification, $firebaseArray, $ionicPopup) {
+app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localStorage, $authService, $state, $firebaseArray, $ionicPopup) {
 
     $ionicPlatform.ready(function () {
         // Check if user is authenticated
@@ -106,16 +99,17 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localS
                 $authService.clearLocalUser();
             }
         }
-
-        /*cordova.plugins.notification.local.on("click", function (notification) {
-            $ionicPopup.alert({
-                title: 'New page',
-                template: 'Please answer the following question within the allotted time.'
-            }).then(function () {
-                $state.go('question', { isDaily: false });
+        if (window.cordova && window.cordova.plugins && window.cordova.plugins.notification.local) {
+            cordova.plugins.notification.local.on("click", function (notification) {
+                $ionicPopup.alert({
+                    title: 'New page received',
+                    template: 'Please answer the following question within the allotted time.'
+                }).then(function () {
+                    $state.go('question', { isDaily: false });
+                });
+                cordova.plugins.notification.local.clearAll();
             });
-            $cordovaLocalNotification.clearAll();
-        });*/
+        }
 
         fireRef.onAuth(authDataCallback);
     });
@@ -126,6 +120,9 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localS
         if (!$localStorage.lastNotification) {
             $localStorage.lastNotification = 0;
         }
+        cordova.plugins.notification.local.on("schedule", function(notification) {
+            $localStorage.lastNotification = moment(notification["at"]).toDate();
+        });
         schedule.$loaded(function (data) {
             var now = new Date().getTime();
             data.forEach(function (item) {
@@ -134,13 +131,11 @@ app.controller('mainCtrl', function ($scope, $rootScope, $ionicPlatform, $localS
                     var event = {
                         id: item.$id,
                         at: stime,
-                        title: "New page!",
+                        title: "New MOC page!",
                         message: "You have received a new page to answer.",
                         sound: "file://sounds/page.aif",
                     };
-                    $cordovaLocalNotification.schedule(event).then(function () {
-                        $localStorage.lastNotification = stime.getTime();
-                    });
+                    cordova.plugins.notification.local.schedule(event);
                 }
             })
         });

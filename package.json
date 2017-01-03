@@ -1,6 +1,6 @@
 {
   "name": "MOC_Pager",
-  "version": "2.0.2",
+  "version": "2.2.7",
   "description": "A pager simulator app used to run an elective course at the University of Ottawa.",
   "dependencies": {
     "gulp": "^3.5.6",
@@ -16,15 +16,18 @@
     "shelljs": "^0.3.0"
   },
   "cordovaPlugins": [
+    "cordova-plugin-whitelist",
+    "cordova-plugin-console",
     "cordova-plugin-statusbar",
     "ionic-plugin-keyboard",
     "cordova-plugin-device",
     "cordova-plugin-splashscreen",
+    "cordova-plugin-app-event",
     {
-      "locator": "https://github.com/katzer/cordova-plugin-local-notifications.git",
+      "locator": "https://github.com/katzer/cordova-plugin-local-notifications",
       "id": "de.appplant.cordova.plugin.local-notification"
     },
-    "cordova-plugin-app-event"
+    "com.telerik.plugins.nativepagetransitions"
   ],
   "cordovaPlatforms": [
     {
