@@ -1,6 +1,6 @@
 {
   "name": "MOC_Pager",
-  "version": "2.2.7",
+  "version": "2.2.8",
   "description": "A pager simulator app used to run an elective course at the University of Ottawa.",
   "dependencies": {
     "gulp": "^3.5.6",

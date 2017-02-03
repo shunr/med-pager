@@ -92,12 +92,7 @@ app.controller('menuControl', function (
 
 // Settings modal
 app.controller('patientsCtrl', function ($scope, $localStorage, $firebaseObject, $firebaseUtils) {
-    $scope.modal = {};
-    $scope.modal.$storage = $localStorage;
-    var patients = $firebaseObject(staticRef.child("patients"));
-    patients.$loaded(function (data) {
-        $scope.modal.$storage.static.patients = $firebaseUtils.toJSON(data);
-    });
+    $scope.patients = $firebaseObject(staticRef.child("patients"));
 });
 
 // Settings modal
